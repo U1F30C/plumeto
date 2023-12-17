@@ -17,30 +17,38 @@ import {
   WhileStatement,
 } from "../language/program";
 
-type ExecutionContext = Record<string, any>;
-
 export type LineSegment = [number, number, number, number];
 
-export class ProgramRunner {
-  executionContext: ExecutionContext = {};
+interface ExecutionContext {
+  symbols: Record<string, any>;
   cursor: {
     x: number;
     y: number;
     angle: number;
     cursorOn: boolean;
-  } = {
-    x: 0,
-    y: 0,
-    angle: 0,
-    cursorOn: true,
   };
+}
+
+export class ProgramRunner {
+  ctx: ExecutionContext;
   addLine: (line: LineSegment) => void = () => {};
   constructor() {
-    this.executionContext = {};
+    this.ctx = this.newContext();
+  }
+  private newContext() {
+    return {
+      symbols: {},
+      cursor: {
+        x: 0,
+        y: 0,
+        angle: 0,
+        cursorOn: true,
+      },
+    };
   }
 
   run(program: Program, addLine: (line: LineSegment) => void) {
-    this.executionContext = {};
+    this.ctx = this.newContext();
     this.addLine = addLine;
     this.executeStatements(program.body);
   }
@@ -86,7 +94,7 @@ export class ProgramRunner {
     const [start, end] = this.resolveRangeExpression(statement.range);
     const direction = start < end ? 1 : -1;
     for (let i = start; i * direction <= end * direction; i += direction) {
-      this.executionContext[statement.variable.name] = i;
+      this.ctx.symbols[statement.variable.name] = i;
       this.executeStatements(statement.body);
     }
   }
@@ -97,7 +105,7 @@ export class ProgramRunner {
     ];
   }
   executeAssignmentStatement(statement: AssignmentStatement) {
-    this.executionContext[statement.left.name] = this.resolveExpression(
+    this.ctx.symbols[statement.left.name] = this.resolveExpression(
       statement.right
     );
   }
@@ -119,35 +127,39 @@ export class ProgramRunner {
   }
   executeForwardCommandStatement(statement: ForwardCommandStatement) {
     const newCursorX =
-      this.cursor.x +
-      Math.cos(this.cursor.angle) *
+      this.ctx.cursor.x +
+      Math.cos(this.ctx.cursor.angle) *
         this.resolveArithmeticExpression(statement.distance);
     const newCursorY =
-      this.cursor.y +
-      Math.sin(this.cursor.angle) *
+      this.ctx.cursor.y +
+      Math.sin(this.ctx.cursor.angle) *
         this.resolveArithmeticExpression(statement.distance);
 
-    if (this.cursor.cursorOn) {
-      this.addLine([this.cursor.x, this.cursor.y, newCursorX, newCursorY]);
-
+    if (this.ctx.cursor.cursorOn) {
+      this.addLine([
+        this.ctx.cursor.x,
+        this.ctx.cursor.y,
+        newCursorX,
+        newCursorY,
+      ]);
     }
-    this.cursor.x = newCursorX;
-    this.cursor.y = newCursorY;
+    this.ctx.cursor.x = newCursorX;
+    this.ctx.cursor.y = newCursorY;
   }
   executeRotateCommandStatement(statement: RotateCommandStatement) {
-    this.cursor.angle =
-      this.cursor.angle +
+    this.ctx.cursor.angle =
+      this.ctx.cursor.angle +
       this.getAngleInRadians(
         this.resolveArithmeticExpression(statement.angle),
         statement.unit
       );
   }
   executePlaceCommandStatement(statement: PlaceCommandStatement) {
-    this.cursor.x = this.resolveArithmeticExpression(statement.x);
-    this.cursor.y = this.resolveArithmeticExpression(statement.y);
+    this.ctx.cursor.x = this.resolveArithmeticExpression(statement.x);
+    this.ctx.cursor.y = this.resolveArithmeticExpression(statement.y);
   }
   executeCursorCommandStatement(statement: CursorCommandStatement) {
-    this.cursor.cursorOn = statement.state === "on";
+    this.ctx.cursor.cursorOn = statement.state === "on";
   }
   getAngleInRadians(angle: number, unit: "rad" | "deg"): number {
     if (unit === "rad") {
@@ -168,7 +180,7 @@ export class ProgramRunner {
     } else if (expression.type === "boolean") {
       return expression.value;
     } else if (expression.type === "identifier") {
-      return this.executionContext[expression.name];
+      return this.ctx.symbols[expression.name];
     } else if (expression.type === "operation") {
       return this.resolveOperation(expression);
     } else if (expression.type === "unaryOperation") {
