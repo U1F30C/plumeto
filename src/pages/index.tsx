@@ -66,6 +66,9 @@ export default function Home() {
         <div className={styles.center}>
           <Draw lines={lines}/>
           <div>
+            <button onClick={runScript} className={styles.button}>
+              Run
+            </button>
             <CodeMirror
               className={styles.codeBox}
               value={script}
@@ -74,9 +77,6 @@ export default function Home() {
         
             />
 
-            <button onClick={runScript} className={styles.button}>
-              Run
-            </button>
           </div>
         </div>
       </main>
