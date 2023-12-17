@@ -37,8 +37,9 @@ ArithmeticExpression = AdditionExpression / ParenthesizedExpression
 AdditionExpression = head:MultiplicationExpression tail:(_ operator:("+"/"-") _ right:MultiplicationExpression)* { return parseOperationList(head, tail) }
 MultiplicationExpression = head:ExponentiationExpression tail:(_ operator:("*"/"/"/"%") _ right:ExponentiationExpression)* { return parseOperationList(head, tail) }
 ExponentiationExpression = head:NumericExpression tail:(_ operator:"^" _ right:NumericExpression)* { return parseOperationList(head, tail) }
-NumericExpression = Number / Identifier / ParenthesizedExpression
+NumericExpression = Number / Identifier / ParenthesizedExpression / MinusExpression
 ParenthesizedExpression = "(" _ expression: ArithmeticExpression _ ")" { return expression }
+MinusExpression = "-" _ expression:NumericExpression { return { type: "unaryOperation", left: expression, operator: "-" } }
 
 
 BooleanExpression = OrExpression / ParenthesizedBooleanExpression

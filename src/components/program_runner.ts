@@ -198,7 +198,11 @@ export class ProgramRunner {
     } else if (expression.type === "boolean") {
       return expression.value;
     } else if (expression.type === "identifier") {
-      return this.ctx.symbols[expression.name];
+      const value = this.ctx.symbols[expression.name];
+      if (value === undefined) {
+        throw new Error("Unknown identifier: " + expression.name);
+      }
+      return value;
     } else if (expression.type === "operation") {
       return this.resolveOperation(expression);
     } else if (expression.type === "unaryOperation") {
@@ -213,6 +217,8 @@ export class ProgramRunner {
       case "!":
         // TODO: validate type?
         return !left;
+      case "-":
+        return -left as number;
       default:
         throw new Error("Unknown unary operator");
     }
