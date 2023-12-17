@@ -9,7 +9,7 @@ Formal launguage definition can be found at `src/language/grammar.pegjs`. In a n
 ### Examples
 
 **Spiral**
-``` python
+``` js
 for x in 1..100 {
   forward x / 4
   rotate 20 deg
@@ -19,7 +19,7 @@ Output:
 ![spiral](screenshots/spiral.png)
 
 **Hexpiral**
-``` python
+``` js
 for x in 1..100 {
   forward 2 * x
   rotate 60.2 deg
@@ -47,3 +47,22 @@ If you make changes to the grammar in `src/language/grammar.pegjs` update the ge
 ```bash
 npm run grammar
 ```
+
+## Roadmap
+- Demo
+  - Add demo
+  - Add examples
+- Language
+  - Fix syntax definition to support whitespaces after statements
+  - Add comments support
+  - Add if statement
+  - Add mathematical functions
+  - Random function
+  - Turing completeness
+  - Other cool stuff
+- UX
+  - Fix styles
+  - Panning
+  - Handle parsing errors
+  - Colors
+- Tests
