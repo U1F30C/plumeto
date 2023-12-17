@@ -7,6 +7,7 @@ import {
   Expression,
   ForStatement,
   ForwardCommandStatement,
+  IfStatement,
   Operation,
   PlaceCommandStatement,
   Program,
@@ -61,9 +62,19 @@ export class ProgramRunner {
       case "for":
         this.executeForStatement(statement);
         break;
+      case "if":
+        this.executeIfStatement(statement);
+        break;
       case "command":
         this.executeCommandStatement(statement);
         break;
+    }
+  }
+  executeIfStatement(statement: IfStatement) {
+    if (this.resolveBooleanExpression(statement.condition)) {
+      this.executeStatements(statement.body);
+    } else if (statement.else) {
+      this.executeStatements(statement.else);
     }
   }
   executeWhileStatement(statement: WhileStatement) {

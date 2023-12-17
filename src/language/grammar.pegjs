@@ -21,11 +21,13 @@ Statements = head:Statement _ tail:(Separator _ Statement _ )* {
     return [head].concat(tail.map(child => child[2]))
 }
 
-Statement = Assignment / WhileBlock / ForBlock / Command
+Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock
 
 Assignment = left:Identifier _ "=" _ right:Expression { return { type: "assignment", left, right } }
 WhileBlock = "while" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" { return { type: "while", condition, body } }
 ForBlock = "for" _ variable:Identifier _ "in" _ range:RangeExpression _ "{" __ body:Statements __ "}" { return { type: "for", variable, range, body } }
+IfBlock = "if" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" _ elseBody:ElseBlock? { return { type: "if", condition, body, else: elseBody ?? null } }
+ElseBlock = "else" _ "{" __ body:Statements __ "}" { return body }
 
 Expression = BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }

@@ -22,6 +22,13 @@ export interface ForStatement {
   body: Statement[];
 }
 
+export interface IfStatement {
+  type: "if";
+  condition: BooleanExpression;
+  body: Statement[];
+  else?: Statement[];
+}
+
 export interface ForwardCommandStatement {
   type: "command";
   command: "forward";
@@ -58,7 +65,8 @@ export type Statement =
   | AssignmentStatement
   | WhileStatement
   | ForStatement
-  | CommandStatement;
+  | CommandStatement
+  | IfStatement;
 
 export interface Operation {
   type: "operation" | "unaryOperation";

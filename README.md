@@ -54,7 +54,6 @@ npm run grammar
   - Add examples
 - Language
   - Add comments support
-  - Add if statement
   - Add mathematical functions
   - Random function
   - Turing completeness
