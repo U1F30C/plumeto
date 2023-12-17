@@ -43,8 +43,8 @@
 
 .codeBox {
   /* position: absolute; */
-  font-weight: 700;
-  font-family: var(--font-mono);
+  /* font-weight: 700;
+  font-family: var(--font-mono); */
   width: 500px;
   height: 500px;
 

@@ -10,7 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.1",
     "@types/numjs": "^0.16.7",
+    "@uiw/react-codemirror": "^4.21.21",
     "next": "14.0.4",
     "numjs": "^0.16.1",
     "peggy": "^3.0.2",

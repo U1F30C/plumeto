@@ -3,15 +3,17 @@ import { LineSegment, ProgramRunner } from "@/components/program_runner";
 import { parser } from "@/language/parser";
 import { Program } from "@/language/program";
 import styles from "@/styles/Home.module.css";
+import CodeMirror from '@uiw/react-codemirror';
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useState } from "react";
+import { javascript } from '@codemirror/lang-javascript';
+
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [script, setScript] = useState(`
-
 
 
   for y in 1..15 {
@@ -23,7 +25,6 @@ export default function Home() {
       rotate 140 + y deg
     }
   }
-    
 
   `);
 
@@ -65,10 +66,12 @@ export default function Home() {
         <div className={styles.center}>
           <Draw lines={lines}/>
           <div>
-            <textarea
+            <CodeMirror
               className={styles.codeBox}
               value={script}
-              onChange={(e) => setScript(e.target.value)}
+              onChange={(e) => setScript(e)}
+              extensions={[javascript({ jsx: true })]}
+        
             />
 
             <button onClick={runScript} className={styles.button}>
