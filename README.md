@@ -53,7 +53,6 @@ npm run grammar
   - Add demo
   - Add examples
 - Language
-  - Fix syntax definition to support whitespaces after statements
   - Add comments support
   - Add if statement
   - Add mathematical functions

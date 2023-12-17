@@ -15,17 +15,17 @@
 }
 
 Program = ProgramRoot
-ProgramRoot = _ body:Statements _ { return { type: "program", body } }
+ProgramRoot = __ body:Statements __ { return { type: "program", body } }
 
-Statements = head:Statement tail:(Separator _ Statement )* {
+Statements = head:Statement _ tail:(Separator _ Statement _ )* {
     return [head].concat(tail.map(child => child[2]))
 }
 
 Statement = Assignment / WhileBlock / ForBlock / Command
 
 Assignment = left:Identifier _ "=" _ right:Expression { return { type: "assignment", left, right } }
-WhileBlock = "while" _ condition:BooleanExpression _ "{" _ body:Statements _ "}" { return { type: "while", condition, body } }
-ForBlock = "for" _ variable:Identifier _ "in" _ range:RangeExpression _ "{" _ body:Statements _ "}" { return { type: "for", variable, range, body } }
+WhileBlock = "while" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" { return { type: "while", condition, body } }
+ForBlock = "for" _ variable:Identifier _ "in" _ range:RangeExpression _ "{" __ body:Statements __ "}" { return { type: "for", variable, range, body } }
 
 Expression = BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }
@@ -70,4 +70,5 @@ DigitSequence = digits:[0-9]+ { return digits.join("") }
 
 Separator "separator" = [\n\r]+
 
-_ "whitespace" = [ \t\n\r]* { return "" }
+_ "whitespace" = [ \t]* { return "" }
+__ "lwhitespace" = [ \t\n\r]* { return "" }
