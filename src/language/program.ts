@@ -55,11 +55,18 @@ export interface CursorCommandStatement {
   state: "on" | "off";
 }
 
+export interface BreadcrumbCommandStatement {
+  type: "command";
+  command: "breadcrumb";
+  action: "pop" | "push";
+}
+
 export type CommandStatement =
   | ForwardCommandStatement
   | RotateCommandStatement
   | PlaceCommandStatement
-  | CursorCommandStatement;
+  | CursorCommandStatement
+  | BreadcrumbCommandStatement;
 
 export type Statement =
   | AssignmentStatement

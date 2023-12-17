@@ -53,11 +53,13 @@ Command = ForwardCommand
     / RotateCommand
     / PlaceAtCommand
     / CursorCommand
+    / BreadcrumbCommand
 
 ForwardCommand = "forward" _ distance:ArithmeticExpression { return { type: "command", command: "forward", distance } }
 RotateCommand = "rotate" _ angle:ArithmeticExpression _ unit:("deg" / "rad") { return { type: "command", command: "rotate", angle, unit } }
 PlaceAtCommand = "place" _ x:ArithmeticExpression _ "," _ y:ArithmeticExpression { return { type: "command", command: "place", x, y } }
 CursorCommand = "cursor" _ state:("on" / "off") { return { type: "command", command: "cursor", state } }
+BreadcrumbCommand = "breadcrumb" _ action:("push" / "pop") { return { type: "command", command: "breadcrumb", action } }
 
 
 

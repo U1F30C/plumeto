@@ -2,6 +2,7 @@ import {
   ArithmeticExpression,
   AssignmentStatement,
   BooleanExpression,
+  BreadcrumbCommandStatement,
   CommandStatement,
   CursorCommandStatement,
   Expression,
@@ -27,6 +28,7 @@ interface ExecutionContext {
     angle: number;
     cursorOn: boolean;
   };
+  locationQueue: [x: number, y: number, angle: number][];
 }
 
 export class ProgramRunner {
@@ -44,6 +46,7 @@ export class ProgramRunner {
         angle: 0,
         cursorOn: true,
       },
+      locationQueue:[]
     };
   }
 
@@ -123,6 +126,21 @@ export class ProgramRunner {
       case "cursor":
         this.executeCursorCommandStatement(statement);
         break;
+      case "breadcrumb":
+        this.executeBreadcrumbCommandStatement(statement);
+        break;
+    }
+  }
+  executeBreadcrumbCommandStatement(statement: BreadcrumbCommandStatement) {
+    if (statement.action === "push") {
+      this.ctx.locationQueue.push([this.ctx.cursor.x, this.ctx.cursor.y, this.ctx.cursor.angle]);
+    } else if (statement.action === "pop") {
+      const [x, y, angle] = this.ctx.locationQueue.pop()!;
+      this.ctx.cursor.x = x;
+      this.ctx.cursor.y = y;
+      this.ctx.cursor.angle = angle;
+    } else {
+      throw new Error("Unknown breadcrumb command");
     }
   }
   executeForwardCommandStatement(statement: ForwardCommandStatement) {
