@@ -59,6 +59,8 @@ npm run grammar
   - Add mathematical functions
   - Random function
   - Turing completeness
+  - Functions
+  - Full support for L-systems
   - Other cool stuff
 - UX
   - Fix styles
