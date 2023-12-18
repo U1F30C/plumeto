@@ -28,7 +28,7 @@ interface ExecutionContext {
     angle: number;
     cursorOn: boolean;
   };
-  locationQueue: [x: number, y: number, angle: number][];
+  locationStack: [x: number, y: number, angle: number][];
 }
 
 export class ProgramRunner {
@@ -46,7 +46,7 @@ export class ProgramRunner {
         angle: 0,
         cursorOn: true,
       },
-      locationQueue:[]
+      locationStack:[]
     };
   }
 
@@ -133,9 +133,9 @@ export class ProgramRunner {
   }
   executeBreadcrumbCommandStatement(statement: BreadcrumbCommandStatement) {
     if (statement.action === "push") {
-      this.ctx.locationQueue.push([this.ctx.cursor.x, this.ctx.cursor.y, this.ctx.cursor.angle]);
+      this.ctx.locationStack.push([this.ctx.cursor.x, this.ctx.cursor.y, this.ctx.cursor.angle]);
     } else if (statement.action === "pop") {
-      const [x, y, angle] = this.ctx.locationQueue.pop()!;
+      const [x, y, angle] = this.ctx.locationStack.pop()!;
       this.ctx.cursor.x = x;
       this.ctx.cursor.y = y;
       this.ctx.cursor.angle = angle;
