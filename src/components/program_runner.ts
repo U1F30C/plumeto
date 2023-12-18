@@ -46,7 +46,7 @@ export class ProgramRunner {
         angle: 0,
         cursorOn: true,
       },
-      locationStack:[]
+      locationStack: [],
     };
   }
 
@@ -133,7 +133,11 @@ export class ProgramRunner {
   }
   executeBreadcrumbCommandStatement(statement: BreadcrumbCommandStatement) {
     if (statement.action === "push") {
-      this.ctx.locationStack.push([this.ctx.cursor.x, this.ctx.cursor.y, this.ctx.cursor.angle]);
+      this.ctx.locationStack.push([
+        this.ctx.cursor.x,
+        this.ctx.cursor.y,
+        this.ctx.cursor.angle,
+      ]);
     } else if (statement.action === "pop") {
       const [x, y, angle] = this.ctx.locationStack.pop()!;
       this.ctx.cursor.x = x;
@@ -144,14 +148,11 @@ export class ProgramRunner {
     }
   }
   executeForwardCommandStatement(statement: ForwardCommandStatement) {
+    const distance = this.resolveArithmeticExpression(statement.distance);
     const newCursorX =
-      this.ctx.cursor.x +
-      Math.cos(this.ctx.cursor.angle) *
-        this.resolveArithmeticExpression(statement.distance);
+      this.ctx.cursor.x + Math.cos(this.ctx.cursor.angle) * distance;
     const newCursorY =
-      this.ctx.cursor.y +
-      Math.sin(this.ctx.cursor.angle) *
-        this.resolveArithmeticExpression(statement.distance);
+      this.ctx.cursor.y + Math.sin(this.ctx.cursor.angle) * distance;
 
     if (this.ctx.cursor.cursorOn) {
       this.addLine([
