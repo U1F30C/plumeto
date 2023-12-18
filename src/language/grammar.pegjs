@@ -48,7 +48,7 @@ AndExpression = head:UnaryExpression tail:(_ operator:"&" _ right:UnaryExpressio
 UnaryExpression = ComparisonEqExpression / NotExpression / ParenthesizedBooleanExpression
 NotExpression = "!" _ expression:BooleanExpression { return { type: "unaryOperation", left: expression, operator: "!" } }
 ParenthesizedBooleanExpression = "(" _ expression:BooleanExpression _ ")" { return expression }
-ComparisonEqExpression = head:ArithmeticExpression tail:(_ operator:("=="/"!="/"<"/">"/">="/"<=") _ ArithmeticExpression)+ { return parseOperationList(head, tail) }
+ComparisonEqExpression = head:ArithmeticExpression tail:(_ operator:("=="/"!="/">="/"<="/"<"/">") _ ArithmeticExpression)+ { return parseOperationList(head, tail) }
 
 Command = ForwardCommand
     / RotateCommand
