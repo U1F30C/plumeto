@@ -1,0 +1,13 @@
+function move (distance){
+  if distance >= 0 {
+    forward(distance)
+    rotate 120 deg
+    move(distance - 10)
+  }
+}
+
+for x in 1..100 {
+  rotate 30 deg
+  move (50)
+  
+}

@@ -1,0 +1,7 @@
+``` js
+for x in 1..100 {
+  forward 2 * x
+  rotate 60.2 deg
+}
+```
+Output:

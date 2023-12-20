@@ -1,6 +1,6 @@
 # Plumeto
 
-This is a drawing application for [turtle graphics](https://en.wikipedia.org/wiki/Turtle_graphics) using a custom scripting language based on [LOGO](https://en.wikipedia.org/wiki/Logo_(programming_language)). Made in inspiration of a highschool project I lost the code of.
+This is a drawing application for [turtle graphics](https://en.wikipedia.org/wiki/Turtle_graphics) using a custom scripting language based on [LOGO](https://en.wikipedia.org/wiki/Logo_(programming_language)). Made in inspiration of a highschool project I lost the code of. It is also able to draw [L-systems](https://en.wikipedia.org/wiki/L-system).
 
 ## Plumeto language
 
@@ -8,25 +8,14 @@ Formal launguage definition can be found at `src/language/grammar.pegjs`. In a n
 
 ### Examples
 
-**Spiral**
-``` js
-for x in 1..100 {
-  forward x / 4
-  rotate 20 deg
-}
-```
-Output:
-![spiral](screenshots/spiral.png)
-
-**Hexpiral**
-``` js
-for x in 1..100 {
-  forward 2 * x
-  rotate 60.2 deg
-}
-```
-Output:
-![hexpiral](screenshots/hexpiral.png)
+See `examples/` folder.
+|Script|Output|
+|-|-|
+|**weed(stochastic,2rounds)**|![weed](screenshots/weed(stochastic,2rounds).png)|
+|**spiral**|![spiral](screenshots/spiral.png)|
+|**hexpiral**|![hexpiral](screenshots/hexpiral.png)|
+|**penta-doodle**|![penta-doodle](screenshots/penta-doodle.png)|
+|**saw**|![saw](screenshots/saw.png)|
 
 ## Development
 
@@ -50,14 +39,15 @@ npm run grammar
 
 ## Roadmap
 - Demo
-  - Add demo with examples
+  - Add live demo with examples
 - Language
   - Fix expression bug where it doesn't accept expected expressions such as
     - a*4+sin(x)
+  - Fix parsing bugs in general
   - Add comments support
   - Fix return statements, they don't work if nested.
-  - Turing completeness
-  - Full support for L-systems
+  - Turing completeness (only needs memory?)
+  - Full support for L-systems (done?)
   - Other cool stuff
 - UX
   - Fix styles
