@@ -1,0 +1,40 @@
+
+angle = 25
+
+function F(iteration){
+  if iteration > 0 {
+    forward 1
+    F(iteration-1)
+    F(iteration-1)
+  }
+}
+
+function X(iteration) {
+  if iteration > 0 {
+    F(iteration)
+    rotate angle deg
+    breadcrumb push
+    breadcrumb push
+    X(iteration-1)
+    breadcrumb pop
+    rotate -angle deg
+    X(iteration-1)
+    breadcrumb pop
+    rotate -angle deg
+    F(iteration)
+    breadcrumb push
+    rotate -angle deg
+    F(iteration)
+    X(iteration-1)
+    breadcrumb pop
+    rotate angle deg
+    X(iteration-1)
+    
+    
+  }
+}
+
+rotate -90 deg
+
+X(6)
+
