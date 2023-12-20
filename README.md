@@ -50,11 +50,11 @@ npm run grammar
 
 ## Roadmap
 - Demo
-  - Add demo
-  - Add examples
+  - Add demo with examples
 - Language
+  - Fix expression bug where it doesn't accept expected expressions such as
+    - a*4+sin(x)
   - Add comments support
-  - Add mathematical and random functions
   - Fix return statements, they don't work if nested.
   - Turing completeness
   - Full support for L-systems

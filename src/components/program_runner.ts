@@ -19,6 +19,7 @@ import {
   RotateCommandStatement,
   Statement,
   WhileStatement,
+  supportedNativeMathFunctions,
 } from "../language/program";
 
 export type LineSegment = [number, number, number, number];
@@ -247,12 +248,20 @@ export class ProgramRunner {
       throw new Error("Unknown expression type");
     }
   }
+  resolveNativeFunctionCall(expression: FunctionCall) {
+    const nativeFunction = Math[expression.name as (typeof supportedNativeMathFunctions)[number]];
+    const args: any[] = expression.arguments.map((arg) => this.resolveExpression(arg));
+    return (nativeFunction as any).apply(null, args);
+  }
+
   executeAndResolveFunctionCall(
     expression: FunctionCall
   ): number | boolean | undefined {
     // probly should have made context management immutable, didn't want to refator all methods
-    const definition = this.ctx.functionDefinitions[expression.name];
-    if (!definition) {
+    let definition = this.ctx.functionDefinitions[expression.name];
+    if (!definition && expression.name in Math) {
+      return this.resolveNativeFunctionCall(expression);
+    } else if (!definition) {
       throw new Error("Unknown function: " + expression.name);
     }
     const args = expression.arguments.map((arg) => this.resolveExpression(arg));

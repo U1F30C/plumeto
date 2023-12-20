@@ -116,6 +116,44 @@ export interface FunctionCall {
   name: string;
   arguments: Expression[];
 }
+// only functinos already present in Math object
+export const supportedNativeMathFunctions = [
+  "abs",
+  "acos",
+  "acosh",
+  "asin",
+  "asinh",
+  "atan",
+  "atanh",
+  "atan2",
+  "cbrt",
+  "ceil",
+  "clz32",
+  "cos",
+  "cosh",
+  "exp",
+  "expm1",
+  "floor",
+  "fround",
+  "hypot",
+  "imul",
+  "log",
+  "log1p",
+  "log10",
+  "log2",
+  "max",
+  "min",
+  "pow",
+  "random",
+  "round",
+  "sign",
+  "sin",
+  "sinh",
+  "sqrt",
+  "tan",
+  "tanh",
+  "trunc",
+] as const;
 
 export interface NumberConstant {
   type: "number";
