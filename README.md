@@ -16,6 +16,8 @@ See `examples/` folder.
 |**hexpiral**|![hexpiral](screenshots/hexpiral.png)|
 |**penta-doodle**|![penta-doodle](screenshots/penta-doodle.png)|
 |**saw**|![saw](screenshots/saw.png)|
+|**stick-saw**|![stick-saw](screenshots/stick-saw.png)|
+|**star**|![star](screenshots/star.png)|
 
 ## Development
 

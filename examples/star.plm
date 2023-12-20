@@ -1,0 +1,8 @@
+
+  for y in 1..61 {
+    breadcrumb push
+    rand = random(1)
+    forward rand * 100
+    breadcrumb pop
+    rotate 6 deg
+  }
