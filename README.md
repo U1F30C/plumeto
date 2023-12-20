@@ -54,10 +54,9 @@ npm run grammar
   - Add examples
 - Language
   - Add comments support
-  - Add mathematical functions
-  - Random function
+  - Add mathematical and random functions
+  - Fix return statements, they don't work if nested.
   - Turing completeness
-  - Functions
   - Full support for L-systems
   - Other cool stuff
 - UX

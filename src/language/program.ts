@@ -29,6 +29,29 @@ export interface IfStatement {
   else?: Statement[];
 }
 
+export interface FunctionDefinitionStatement {
+  type: "functionDefinition";
+  name: string;
+  parameters: Identifier[];
+  body: FunctionStatement[];
+}
+
+export type Statement =
+  | AssignmentStatement
+  | WhileStatement
+  | ForStatement
+  | CommandStatement
+  | IfStatement
+  | FunctionDefinitionStatement
+  | Expression;
+
+export type FunctionStatement = Statement | ReturnStatement;
+
+export interface ReturnStatement {
+  type: "return";
+  expression: Expression;
+}
+
 export interface ForwardCommandStatement {
   type: "command";
   command: "forward";
@@ -68,13 +91,6 @@ export type CommandStatement =
   | CursorCommandStatement
   | BreadcrumbCommandStatement;
 
-export type Statement =
-  | AssignmentStatement
-  | WhileStatement
-  | ForStatement
-  | CommandStatement
-  | IfStatement;
-
 export interface Operation {
   type: "operation" | "unaryOperation";
   left: Expression;
@@ -86,13 +102,21 @@ export type Expression =
   | Operation
   | Identifier
   | NumberConstant
-  | BooleanConstant;
+  | BooleanConstant
+  | FunctionCall;
 
 export type Identifier = { type: "identifier"; name: string };
 export interface BooleanConstant {
   type: "boolean";
   value: boolean;
 }
+
+export interface FunctionCall {
+  type: "functionCall";
+  name: string;
+  arguments: Expression[];
+}
+
 export interface NumberConstant {
   type: "number";
   value: number;

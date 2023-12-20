@@ -8,6 +8,9 @@ import {
   Expression,
   ForStatement,
   ForwardCommandStatement,
+  FunctionCall,
+  FunctionDefinitionStatement,
+  FunctionStatement,
   IfStatement,
   Operation,
   PlaceCommandStatement,
@@ -22,6 +25,7 @@ export type LineSegment = [number, number, number, number];
 
 interface ExecutionContext {
   symbols: Record<string, any>;
+  functionDefinitions: Record<string, FunctionDefinitionStatement>;
   cursor: {
     x: number;
     y: number;
@@ -37,9 +41,19 @@ export class ProgramRunner {
   constructor() {
     this.ctx = this.newContext();
   }
-  private newContext() {
+  private cloneContext() {
+    const ctx = this.ctx;
+    return {
+      symbols: { ...ctx.symbols },
+      functionDefinitions: { ...ctx.functionDefinitions },
+      cursor: { ...ctx.cursor },
+      locationStack: [...ctx.locationStack],
+    };
+  }
+  private newContext(): ExecutionContext {
     return {
       symbols: {},
+      functionDefinitions: {},
       cursor: {
         x: 0,
         y: 0,
@@ -62,6 +76,15 @@ export class ProgramRunner {
     }
   }
 
+  executeFunctionStatements(statements: FunctionStatement[]) {
+    for (let statement of statements) {
+      if (statement.type === "return") {
+        return this.resolveExpression(statement.expression);
+      }
+      this.executeStatement(statement);
+    }
+  }
+
   executeStatement(statement: Statement) {
     switch (statement.type) {
       case "assignment":
@@ -79,7 +102,16 @@ export class ProgramRunner {
       case "command":
         this.executeCommandStatement(statement);
         break;
+      case "functionDefinition":
+        this.executeFunctionDefinitionStatement(statement);
+        break;
+      case "functionCall":
+        this.executeAndResolveFunctionCall(statement);
+        break;
     }
+  }
+  executeFunctionDefinitionStatement(statement: FunctionDefinitionStatement) {
+    this.ctx.functionDefinitions[statement.name] = statement;
   }
   executeIfStatement(statement: IfStatement) {
     if (this.resolveBooleanExpression(statement.condition)) {
@@ -112,6 +144,7 @@ export class ProgramRunner {
       statement.right
     );
   }
+
   executeCommandStatement(statement: CommandStatement) {
     switch (statement.command) {
       case "forward":
@@ -208,9 +241,44 @@ export class ProgramRunner {
       return this.resolveOperation(expression);
     } else if (expression.type === "unaryOperation") {
       return this.resolveUnaryOperation(expression);
+    } else if (expression.type === "functionCall") {
+      return this.executeAndResolveFunctionCall(expression) as number | boolean;
     } else {
       throw new Error("Unknown expression type");
     }
+  }
+  executeAndResolveFunctionCall(
+    expression: FunctionCall
+  ): number | boolean | undefined {
+    // probly should have made context management immutable, didn't want to refator all methods
+    const definition = this.ctx.functionDefinitions[expression.name];
+    if (!definition) {
+      throw new Error("Unknown function: " + expression.name);
+    }
+    const args = expression.arguments.map((arg) => this.resolveExpression(arg));
+    const newCtx = this.cloneContext();
+    for (let i = 0; i < definition.parameters.length; i++) {
+      newCtx.symbols[definition.parameters[i].name] = args[i];
+    }
+    const oldCtx = this.ctx;
+    this.ctx = newCtx;
+    const returnValue = this.executeFunctionStatements(definition.body);
+    for (const parameter of definition.parameters) {
+      delete newCtx.symbols[parameter.name];
+    }
+    // global data is shared between function calls and should be updatable in the function
+    // that includes the cursor, locationStack
+    // function definitions are scoped to the function
+    // symbols declared as function parameters are scoped to the function, otherwhise they are global
+
+    this.ctx = {
+      symbols: { ...oldCtx.symbols, ...newCtx.symbols },
+      functionDefinitions: oldCtx.functionDefinitions,
+      cursor: this.ctx.cursor,
+      locationStack: this.ctx.locationStack,
+    };
+
+    return returnValue;
   }
   resolveUnaryOperation(expression: Operation): number | boolean {
     const left = this.resolveExpression(expression.left);

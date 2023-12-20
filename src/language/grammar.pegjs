@@ -21,23 +21,29 @@ Statements = head:Statement _ tail:(Separator _ Statement _ )* {
     return [head].concat(tail.map(child => child[2]))
 }
 
-Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock
+Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock / FunctionDefinition / Expression
+FunctionStatements = ReturnStatement / Statements
+ReturnStatement = "return" _ expression:Expression { return { type: "return", expression } }
 
 Assignment = left:Identifier _ "=" _ right:Expression { return { type: "assignment", left, right } }
 WhileBlock = "while" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" { return { type: "while", condition, body } }
 ForBlock = "for" _ variable:Identifier _ "in" _ range:RangeExpression _ "{" __ body:Statements __ "}" { return { type: "for", variable, range, body } }
 IfBlock = "if" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" _ elseBody:ElseBlock? { return { type: "if", condition, body, else: elseBody ?? null } }
 ElseBlock = "else" _ "{" __ body:Statements __ "}" { return body }
+FunctionDefinition = "function" _ name:Identifier _ "(" _ parameters:FunctionParameters _ ")" _ "{" __ body:FunctionStatements __ "}" { return { type: "functionDefinition", name: name.name, parameters, body } }
+FunctionParameters = head:Identifier tail:(_ "," _ Identifier _ )* { return [head].concat(tail.map(child => child[3])) }
 
-Expression = BooleanExpression / ArithmeticExpression
+Expression = FunctionCall / BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }
 
+FunctionCall = name:Identifier _ "(" _  functionArguments:FunctionArguments _ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments } }
+FunctionArguments = head:Expression tail:(_ "," _ Expression _ )* { return [head].concat(tail.map(child => child[3])) }
 
 ArithmeticExpression = AdditionExpression / ParenthesizedExpression
 AdditionExpression = head:MultiplicationExpression tail:(_ operator:("+"/"-") _ right:MultiplicationExpression)* { return parseOperationList(head, tail) }
 MultiplicationExpression = head:ExponentiationExpression tail:(_ operator:("*"/"/"/"%") _ right:ExponentiationExpression)* { return parseOperationList(head, tail) }
 ExponentiationExpression = head:NumericExpression tail:(_ operator:"^" _ right:NumericExpression)* { return parseOperationList(head, tail) }
-NumericExpression = Number / Identifier / ParenthesizedExpression / MinusExpression
+NumericExpression = Number / Identifier / ParenthesizedExpression / MinusExpression / FunctionCall
 ParenthesizedExpression = "(" _ expression: ArithmeticExpression _ ")" { return expression }
 MinusExpression = "-" _ expression:NumericExpression { return { type: "unaryOperation", left: expression, operator: "-" } }
 
