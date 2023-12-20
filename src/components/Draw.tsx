@@ -22,10 +22,9 @@ export function Draw(props: DrawProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    console.log("useEffect", props.lines);
     if (canvasRef.current !== null) {
       const rc = rough.canvas(canvasRef.current!);
-      const adjustedLines = nj.array(props.lines).add(250).tolist() as LineSegment[];
+      const adjustedLines = nj.array(props.lines.slice(-1)).add(250).tolist() as LineSegment[];
       for(const line of adjustedLines) {
         const lines = rc.line(...line);
         rc.draw(lines);

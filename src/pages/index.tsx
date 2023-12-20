@@ -35,14 +35,19 @@ export default function Home() {
     // canvas.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  function runScript() {
+  async function runScript() {
     console.log(script);
     try {
       const program = parser.parse(script) as Program;
       const runner = new ProgramRunner();
-      runner.run(program, (line) => {
-        setLines((lines) => [...lines, line]);
+      const buffer = [] as any[];
+      runner.run(program, async (line) => {
+        buffer.push(line);
       });
+      for (const line of buffer) {
+        setLines((lines) => [...lines, line]);
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      }
     } catch (e) {
       console.log(e);
     }
