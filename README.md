@@ -49,7 +49,6 @@ npm run grammar
   - Add comments support
   - Fix return statements, they don't work if nested.
   - Turing completeness (only needs memory?)
-  - Full support for L-systems (done?)
   - Other cool stuff
 - UX
   - Fix styles
