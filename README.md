@@ -40,8 +40,6 @@ npm run grammar
 ```
 
 ## Roadmap
-- Demo
-  - Add live demo with examples
 - Language
   - Fix expression bug where it doesn't accept expected expressions such as
     - a*4+sin(x)
@@ -52,6 +50,7 @@ npm run grammar
   - Other cool stuff
 - UX
   - Fix styles
+  - Fix dark mode
   - Panning
   - Handle parsing errors
   - Colors
