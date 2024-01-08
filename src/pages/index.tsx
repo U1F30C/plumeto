@@ -8,24 +8,56 @@ import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useState } from "react";
 import { javascript } from '@codemirror/lang-javascript';
+import { InferGetStaticPropsType } from "next";
 
+interface FileData {
+  fileName: string;
+  fileContents: string;
+}
+
+interface Props {
+  filesData: FileData[];
+}
+
+
+export function getStaticProps(): { props: Props } {
+  // list files under ../../examples
+  const fs = require("fs");
+  const path = require("path");
+  const dir = path.join(process.cwd(), "examples");
+  const files = fs.readdirSync(dir);
+
+  // read the content of each file and put it in an object
+
+  const filesData = files.map((file: string) => {
+    const fileName = path.join(dir, file);
+    const fileContents = fs.readFileSync(fileName, "utf8");
+    return {
+      fileName: file,
+      fileContents,
+    };
+  });
+
+  return {
+    props: {
+      filesData,
+    },
+  };
+}
+  
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-  const [script, setScript] = useState(`
+export default function Home({
+  filesData,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
 
-
-  for y in 1..15 {
-    rotate 90 deg
-    forward y * 10
-    for x in 0..5 {
-      x = x
-      forward 10 + x *5 + y * 5
-      rotate 140 + y deg
+  const [script, setScript] = useState(`for x in 1..12 {
+    for y in 1..60 {
+      rotate y deg
+      forward 5 
     }
   }
-
   `);
 
   const [lines, setLines] = useState<LineSegment[]>([]);
@@ -77,6 +109,15 @@ export default function Home() {
             <button onClick={reset} className={styles.button}>
               Reset
             </button>
+
+            {/* // select listing of files */}
+            <select onChange={(e) => setScript(e.target.value)}>
+              {filesData && filesData.map((fileData) => (
+                <option key={fileData.fileName} value={fileData.fileContents}>
+                  {fileData.fileName}
+                </option>
+              ))}
+            </select>
             <CodeMirror
               className={styles.codeBox}
               value={script}
