@@ -74,6 +74,9 @@ export default function Home() {
             <button onClick={runScript} className={styles.button}>
               Run
             </button>
+            <button onClick={reset} className={styles.button}>
+              Reset
+            </button>
             <CodeMirror
               className={styles.codeBox}
               value={script}

@@ -21,6 +21,13 @@ interface DrawProps {
 export function Draw(props: DrawProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // clear canvas if lines are empty
+  useEffect(() => {
+    if (canvasRef.current !== null && props.lines.length === 0) {
+      canvasRef.current?.getContext("2d")?.clearRect(0, 0, 500, 500);
+    }
+  }, [canvasRef, canvasRef.current, props.lines]);
+
   useEffect(() => {
     if (canvasRef.current !== null) {
       const rc = rough.canvas(canvasRef.current!);
