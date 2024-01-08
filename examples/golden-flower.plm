@@ -1,0 +1,34 @@
+
+phi flower
+
+phi = 1.618034
+
+function leaf(_){
+  rand = random(1)
+  step = 4 + rand * 4
+  i = 90 /4
+  angle = 0.4 * 4
+
+  breadcrumb push
+  for x in 1..i {
+    forward step
+    rotate angle deg
+  }
+  breadcrumb pop
+  rotate 35 deg
+  for x in 1..i {
+    forward step
+    rotate -angle deg
+  }
+}
+
+for x in 1..36 {
+  rotate (360 *phi) deg
+  breadcrumb push
+
+  rand = random(1)
+
+  leaf(1)
+
+  breadcrumb pop
+}

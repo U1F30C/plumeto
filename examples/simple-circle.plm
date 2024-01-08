@@ -1,0 +1,4 @@
+for x in 1..360 {
+  forward 1
+  rotate 1 deg
+}

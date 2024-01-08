@@ -1,0 +1,7 @@
+for x in 1..150 {
+  rotate 10 deg
+  for y in 1..360 /8 {
+    rotate 8 deg
+    forward 8
+  }
+}

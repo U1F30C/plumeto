@@ -1,0 +1,37 @@
+
+function golden_spiral(a, b, scale, i) {
+  for x in 1..i {
+    next_fibonacci = a + b
+    a = b
+    b = next_fibonacci
+    for y in 1..90/4 {
+      rotate 1*4 deg
+      forward scale * a
+    }
+  }
+}
+
+phi = 1.618034
+
+global_scale = 0.5
+for x in 1..4 {
+  a = 0
+  b = 1
+  rotate 180 deg
+
+  breadcrumb push
+  golden_spiral(a, b, global_scale, 7)
+  forward 10
+  breadcrumb pop
+
+  cursor off
+  forward -15
+  rotate -90 deg
+  forward 15 + 15 * phi
+  rotate 90 deg
+  forward 15 * phi
+  cursor on
+
+  rotate 90 deg
+
+}

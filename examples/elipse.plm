@@ -1,0 +1,9 @@
+angle = 0
+rotate 90 deg
+
+for x in 1..360/10  {
+  sin_angle = abs(sin((angle)))
+  angle = angle + 0.0174533 * 10
+  forward 5 + sin_angle * 15
+  rotate 10 deg
+}

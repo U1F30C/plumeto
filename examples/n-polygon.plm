@@ -1,0 +1,5 @@
+n = 5
+for x in 1..n {
+  forward 100
+  rotate 360 / n deg
+}

@@ -1,0 +1,30 @@
+
+function figure(scale, sides) {
+  rand = random(1)
+  if rand >  0.1{
+    for x in 1..sides {
+      forward scale
+      rotate 360 / sides deg
+    }
+  }
+}
+
+base_unit =  10
+
+rotate 30 deg
+for x in 1..10 {
+  cursor off
+  forward base_unit * 2
+  cursor on
+  breadcrumb push
+  rotate 120 deg
+  for y in 1..10 {
+    rotate -30 deg
+    figure(base_unit, 6)
+    rotate 30 deg
+    cursor off
+    forward base_unit * 2
+    cursor on
+  }
+  breadcrumb pop
+}

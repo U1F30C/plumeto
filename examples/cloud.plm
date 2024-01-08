@@ -1,0 +1,6 @@
+for x in 1..12 {
+  for y in 1..60 {
+    rotate y deg
+    forward 5 
+  }
+}
