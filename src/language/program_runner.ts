@@ -20,7 +20,7 @@ import {
   Statement,
   WhileStatement,
   supportedNativeMathFunctions,
-} from "../language/program";
+} from "./program";
 
 export type LineSegment = [number, number, number, number];
 

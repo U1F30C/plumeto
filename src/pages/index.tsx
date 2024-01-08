@@ -1,5 +1,5 @@
 import { Draw } from "@/components/Draw";
-import { LineSegment, ProgramRunner } from "@/components/program_runner";
+import { LineSegment, ProgramRunner } from "@/language/program_runner";
 import { parser } from "@/language/parser";
 import { Program } from "@/language/program";
 import styles from "@/styles/Home.module.css";

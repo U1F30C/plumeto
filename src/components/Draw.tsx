@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import rough from 'roughjs';
 import nj, {NdArray} from 'numjs';
-import { LineSegment } from './program_runner';
+import { LineSegment } from '../language/program_runner';
 
 const base = nj.array(nj.arange(0, 1000, 10));
 const xAxis = nj.cos(base.divide(100)).multiply(100);
