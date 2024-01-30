@@ -1,7 +1,4 @@
-``` js
 for x in 1..100 {
   forward x / 4
   rotate 20 deg
 }
-```
-Output:
