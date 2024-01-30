@@ -33,7 +33,7 @@ export function Draw(props: DrawProps) {
       const rc = rough.canvas(canvasRef.current!);
       const adjustedLines = nj.array(props.lines.slice(-1)).add(250).tolist() as LineSegment[];
       for(const line of adjustedLines) {
-        const lines = rc.line(...line);
+        const lines = rc.line(...line, {stroke: 'gray', strokeWidth: 2});
         rc.draw(lines);
       }
       // const lines = rc.linearPath(
