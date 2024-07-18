@@ -96,10 +96,12 @@ export default function Home({
       <main className={`${styles.main} ${inter.className}`}>
         <div className={styles.description}>
           <p>
-            <code className={styles.code}>
-              <img src="/github.svg" width="32px" />
-              Plumeto
-            </code>
+            <a href="https://github.com/U1F30C/plumeto">
+              <code className={styles.code}>
+                <img src="/github.svg" width="32px" />
+                Plumeto
+              </code>
+            </a>
           </p>
         </div>
 
