@@ -1,18 +1,7 @@
 import { useEffect, useRef } from 'react';
 import rough from 'roughjs';
-import nj, {NdArray} from 'numjs';
+import type { RoughCanvas } from 'roughjs/bin/canvas';
 import { LineSegment } from '../language/program_runner';
-
-const base = nj.array(nj.arange(0, 1000, 10));
-const xAxis = nj.cos(base.divide(100)).multiply(100);
-const yAxis = nj.sin(base.divide(100)).multiply(100);
-
-
-const lineData = nj.stack([xAxis, yAxis], -1);
-
-function centerLine(lineData: NdArray): [number, number][] {
-    return lineData.add(250).tolist() as [number, number][];
-}
 
 interface DrawProps {
   lines: LineSegment[];
@@ -20,27 +9,29 @@ interface DrawProps {
 
 export function Draw(props: DrawProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // clear canvas if lines are empty
-  useEffect(() => {
-    if (canvasRef.current !== null && props.lines.length === 0) {
-      canvasRef.current?.getContext("2d")?.clearRect(0, 0, 500, 500);
-    }
-  }, [canvasRef, canvasRef.current, props.lines]);
+  const rcRef = useRef<RoughCanvas | null>(null);
 
   useEffect(() => {
-    if (canvasRef.current !== null) {
-      const rc = rough.canvas(canvasRef.current!);
-      const adjustedLines = nj.array(props.lines.slice(-1)).add(250).tolist() as LineSegment[];
-      for(const line of adjustedLines) {
-        const lines = rc.line(...line, {stroke: 'gray', strokeWidth: 2});
-        rc.draw(lines);
-      }
-      // const lines = rc.linearPath(
-      //   centerLine(lineData),
-      // );
+    if (canvasRef.current === null) return;
+    const canvas = canvasRef.current;
+    if (props.lines.length === 0) {
+      canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
     }
-  }
-    , [canvasRef, canvasRef.current, props.lines]);
+  }, [props.lines]);
+
+  useEffect(() => {
+    if (canvasRef.current === null) return;
+    if (!rcRef.current) rcRef.current = rough.canvas(canvasRef.current);
+    const rc = rcRef.current;
+    const canvas = canvasRef.current;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const last = props.lines.at(-1);
+    if (last) {
+      const [x1, y1, x2, y2] = last;
+      rc.draw(rc.line(x1 + cx, y1 + cy, x2 + cx, y2 + cy, { stroke: 'gray', strokeWidth: 2 }));
+    }
+  }, [props.lines]);
+
   return <canvas id="canvas" width="500" height="500" ref={canvasRef} />;
 }

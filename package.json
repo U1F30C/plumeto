@@ -3,19 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "grammar": "peggy -o src/language/_parser.js src/language/grammar.pegjs",
-    "build": "npm run grammar & next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vite",
+    "grammar": "peggy --format es -o src/language/_parser.js src/language/grammar.pegjs",
+    "build": "npm run grammar && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.1",
     "@types/numjs": "^0.16.7",
     "@uiw/react-codemirror": "^4.21.21",
-    "next": "14.0.4",
     "numjs": "^0.16.1",
-    "peggy": "^3.0.2",
     "react": "^18",
     "react-dom": "^18",
     "roughjs": "^4.6.6"
@@ -24,6 +21,9 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "@vitejs/plugin-react": "^4.2.1",
+    "peggy": "^3.0.2",
+    "typescript": "^5",
+    "vite": "^5.0.0"
   }
 }

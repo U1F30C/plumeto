@@ -1,5 +1,5 @@
 import { Parser } from "peggy";
-import _parser from "./_parser";
+import * as _parser from "./_parser";
 
 const parser: Parser = _parser as any;
 
