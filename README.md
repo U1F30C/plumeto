@@ -39,6 +39,15 @@ If you make changes to the grammar in `src/language/grammar.pegjs` update the ge
 npm run grammar
 ```
 
+## CLI
+
+Render a `.plm` script to SVG from the command line:
+
+```bash
+node cli/bin.js examples/spiral.plm            # outputs spiral.svg
+node cli/bin.js examples/spiral.plm -o out.svg
+```
+
 ## Roadmap
 - Language
   - Fix expression bug where it doesn't accept expected expressions such as
