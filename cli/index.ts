@@ -10,12 +10,23 @@ const CENTER = SIZE / 2
 const STROKE = 'gray'
 const STROKE_WIDTH = 2
 
+const PAD = 8
+
 function toSvg(lines: LineSegment[]): string {
+  const xs = lines.flatMap(([x1, , x2]) => [x1, x2])
+  const ys = lines.flatMap(([, y1, , y2]) => [y1, y2])
+  const minX = Math.min(...xs) - PAD
+  const minY = Math.min(...ys) - PAD
+  const maxX = Math.max(...xs) + PAD
+  const maxY = Math.max(...ys) + PAD
+  const w = maxX - minX
+  const h = maxY - minY
+
   const lineElements = lines.map(([x1, y1, x2, y2]) =>
-    `  <line x1="${x1 + CENTER}" y1="${y1 + CENTER}" x2="${x2 + CENTER}" y2="${y2 + CENTER}" stroke="${STROKE}" stroke-width="${STROKE_WIDTH}"/>`
+    `  <line x1="${x1 - minX}" y1="${y1 - minY}" x2="${x2 - minX}" y2="${y2 - minY}" stroke="${STROKE}" stroke-width="${STROKE_WIDTH}"/>`
   ).join('\n')
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
 ${lineElements}
 </svg>`
 }

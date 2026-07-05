@@ -6,7 +6,7 @@ function move (distance){
   }
 }
 
-for x in 1..100 {
+for x in 1..12 {
   rotate 30 deg
   move (50)
   
