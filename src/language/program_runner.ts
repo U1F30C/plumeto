@@ -104,8 +104,9 @@ export class ProgramRunner {
       case "functionDefinition":
         this.executeFunctionDefinitionStatement(statement);
         break;
-      case "functionCall":
-        this.executeAndResolveFunctionCall(statement);
+      default:
+        // bare expressions are evaluated too, so typos like an unknown name still error
+        this.resolveExpression(statement);
         break;
     }
   }

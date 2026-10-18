@@ -30,21 +30,22 @@ Statements = head:Statement _ tail:(Separator _ Statement _ )* {
 }
 
 Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock / FunctionDefinition / ReturnStatement / Expression
-ReturnStatement = "return" ![A-Za-z_] _ expression:Expression { return { type: "return", expression } }
+ReturnStatement = "return" KeywordEnd _ expression:Expression { return { type: "return", expression } }
 
 Assignment = left:Identifier _ "=" _ right:Expression { return { type: "assignment", left, right } }
-WhileBlock = "while" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" { return { type: "while", condition, body } }
-ForBlock = "for" _ variable:Identifier _ "in" _ range:RangeExpression _ "{" __ body:Statements __ "}" { return { type: "for", variable, range, body } }
-IfBlock = "if" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" _ elseBody:ElseBlock? { return { type: "if", condition, body, else: elseBody ?? null } }
-ElseBlock = "else" _ "{" __ body:Statements __ "}" { return body }
-FunctionDefinition = "function" _ name:Identifier _ "(" _ parameters:FunctionParameters _ ")" _ "{" __ body:Statements __ "}" { return { type: "functionDefinition", name: name.name, parameters, body } }
-FunctionParameters = head:Identifier tail:(_ "," _ Identifier _ )* { return [head].concat(tail.map(child => child[3])) }
+WhileBlock = "while" KeywordEnd _ condition:BooleanExpression __ body:Block { return { type: "while", condition, body } }
+ForBlock = "for" KeywordEnd _ variable:Identifier _ "in" KeywordEnd _ range:RangeExpression __ body:Block { return { type: "for", variable, range, body } }
+IfBlock = "if" KeywordEnd _ condition:BooleanExpression __ body:Block elseBody:(__ @ElseBlock)? { return { type: "if", condition, body, else: elseBody ?? null } }
+ElseBlock = "else" KeywordEnd __ body:Block { return body }
+FunctionDefinition = "function" KeywordEnd _ name:Identifier _ "(" __ parameters:FunctionParameters __ ")" __ body:Block { return { type: "functionDefinition", name: name.name, parameters, body } }
+FunctionParameters = head:Identifier tail:(__ "," __ Identifier)* { return [head].concat(tail.map(child => child[3])) }
+Block = "{" __ body:Statements? __ "}" { return body ?? [] }
 
 Expression = BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }
 
-FunctionCall = name:Identifier _ "(" _  functionArguments:FunctionArguments _ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments } }
-FunctionArguments = head:Expression tail:(_ "," _ Expression _ )* { return [head].concat(tail.map(child => child[3])) }
+FunctionCall = name:Identifier _ "(" __ functionArguments:FunctionArguments __ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments } }
+FunctionArguments = head:Expression tail:(__ "," __ Expression)* { return [head].concat(tail.map(child => child[3])) }
 
 ArithmeticExpression = AdditionExpression / ParenthesizedExpression
 AdditionExpression = head:MultiplicationExpression tail:(_ operator:("+"/"-") _ right:MultiplicationExpression)* { return parseOperationList(head, tail) }
@@ -69,15 +70,18 @@ Command = ForwardCommand
     / CursorCommand
     / BreadcrumbCommand
 
-ForwardCommand = "forward" _ distance:ArithmeticExpression { return { type: "command", command: "forward", distance } }
-RotateCommand = "rotate" _ angle:ArithmeticExpression _ unit:("deg" / "rad") { return { type: "command", command: "rotate", angle, unit } }
-PlaceAtCommand = "place" _ x:ArithmeticExpression _ "," _ y:ArithmeticExpression { return { type: "command", command: "place", x, y } }
-CursorCommand = "cursor" _ state:("on" / "off") { return { type: "command", command: "cursor", state } }
-BreadcrumbCommand = "breadcrumb" _ action:("push" / "pop") { return { type: "command", command: "breadcrumb", action } }
+ForwardCommand = "forward" KeywordEnd _ distance:ArithmeticExpression { return { type: "command", command: "forward", distance } }
+RotateCommand = "rotate" KeywordEnd _ angle:ArithmeticExpression _ unit:("deg" / "rad") KeywordEnd { return { type: "command", command: "rotate", angle, unit } }
+PlaceAtCommand = "place" KeywordEnd _ x:ArithmeticExpression _ "," _ y:ArithmeticExpression { return { type: "command", command: "place", x, y } }
+CursorCommand = "cursor" KeywordEnd _ state:("on" / "off") KeywordEnd { return { type: "command", command: "cursor", state } }
+BreadcrumbCommand = "breadcrumb" KeywordEnd _ action:("push" / "pop") KeywordEnd { return { type: "command", command: "breadcrumb", action } }
 
 
 
-Identifier = word:[A-Za-z_]+ { return { type: "identifier", name: word.join("") } }
+Identifier = name:$([A-Za-z_] IdentifierChar*) { return { type: "identifier", name } }
+IdentifierChar = [A-Za-z0-9_]
+// keywords must not run into a name, so forward_line(3) is a call rather than "forward _line(3)"
+KeywordEnd = !IdentifierChar
 
 Number = sign:Sign? int:DigitSequence decimal:DecimalPart? { return { type: "number", value: parseFloat((sign ?? "") + int + decimal, 10) } }
 Sign = "+" / "-"
