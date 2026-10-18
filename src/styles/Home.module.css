@@ -109,9 +109,31 @@
 .canvas {
   position: absolute;
   inset: 0;
+}
+
+.drawingCanvas {
   width: 100%;
   height: 100%;
   display: block;
+  /* the canvas handles touch itself: drag to pan, pinch to zoom */
+  touch-action: none;
+  cursor: grab;
+}
+
+.drawingCanvas:active {
+  cursor: grabbing;
+}
+
+.zoomControls {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.zoomControls .iconButton {
+  background: var(--panel);
 }
 
 .panel[hidden] {
