@@ -11,7 +11,10 @@ Formal launguage definition can be found at `src/language/grammar.pegjs`. In a n
 See the `examples/` folder, grouped into `basics/`, `patterns/`, `golden-ratio/` and `l-systems/`.
 |Script|Output|
 |-|-|
+|**heptapod-logogram**|![heptapod-logogram](screenshots/heptapod-logogram.png)|
 |**weed(stochastic)**|![weed](screenshots/weed(stochastic).png)|
+|**penrose-tiling**|![penrose-tiling](screenshots/penrose-tiling.png)|
+|**gosper-curve**|![gosper-curve](screenshots/gosper-curve.png)|
 |**spiral**|![spiral](screenshots/spiral.png)|
 |**hexpiral**|![hexpiral](screenshots/hexpiral.png)|
 |**penta-doodle**|![penta-doodle](screenshots/penta-doodle.png)|
