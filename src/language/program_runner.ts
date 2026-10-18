@@ -307,8 +307,10 @@ export class ProgramRunner {
     this.callDepth++;
     const returnValue = this.executeStatements(definition.body)?.value;
     this.callDepth--;
+    // nested calls replace this.ctx, so the body's writes live in whatever it is now, not in newCtx
+    const bodyCtx = this.ctx;
     for (const parameter of definition.parameters) {
-      delete newCtx.symbols[parameter.name];
+      delete bodyCtx.symbols[parameter.name];
     }
     // global data is shared between function calls and should be updatable in the function
     // that includes the cursor, locationStack
@@ -316,10 +318,10 @@ export class ProgramRunner {
     // symbols declared as function parameters are scoped to the function, otherwhise they are global
 
     this.ctx = {
-      symbols: { ...oldCtx.symbols, ...newCtx.symbols },
+      symbols: { ...oldCtx.symbols, ...bodyCtx.symbols },
       functionDefinitions: oldCtx.functionDefinitions,
-      cursor: this.ctx.cursor,
-      locationStack: this.ctx.locationStack,
+      cursor: bodyCtx.cursor,
+      locationStack: bodyCtx.locationStack,
     };
 
     return returnValue;
