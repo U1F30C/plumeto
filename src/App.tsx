@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { javascript } from '@codemirror/lang-javascript';
 import { Diagnostic, setDiagnostics } from '@codemirror/lint';
 import { examples } from "@/examples";
+import { useTheme } from "@/theme";
 
 const editorExtensions = [javascript({ jsx: true })]
 
@@ -32,7 +33,9 @@ export default function App() {
   const [lines, setLines] = useState<LineSegment[]>([]);
   const [visibleCount, setVisibleCount] = useState(0);
   const [speed, setSpeed] = useState<Speed>("Normal");
+  const [animating, setAnimating] = useState(false);
   const [error, setError] = useState<PlumetoError | null>(null);
+  const { theme, toggleTheme } = useTheme();
   const editorRef = useRef<EditorView | null>(null);
   const frameRef = useRef<number | null>(null);
   // read inside the animation loop, so changing speed mid-drawing takes effect right away
@@ -44,9 +47,21 @@ export default function App() {
       cancelAnimationFrame(frameRef.current);
       frameRef.current = null;
     }
+    setAnimating(false);
   }
 
   useEffect(() => stopAnimation, []);
+
+  // the drawing is centered in the space right of the editor panel, so track where the panel ends
+  const panelRef = useRef<HTMLElement>(null);
+  const [panelRight, setPanelRight] = useState(0);
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    const observer = new ResizeObserver(() => setPanelRight(panel.offsetLeft + panel.offsetWidth));
+    observer.observe(panel);
+    return () => observer.disconnect();
+  }, []);
 
   function animate(total: number) {
     stopAnimation();
@@ -55,11 +70,13 @@ export default function App() {
       count = Math.min(count + speeds[speedRef.current], total);
       setVisibleCount(count);
       frameRef.current = count < total ? requestAnimationFrame(step) : null;
+      if (frameRef.current === null) setAnimating(false);
     };
+    setAnimating(true);
     frameRef.current = requestAnimationFrame(step);
   }
 
-  function reset() {
+  function clear() {
     stopAnimation();
     setLines([]);
     setVisibleCount(0);
@@ -109,49 +126,60 @@ export default function App() {
   }
 
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          <a href="https://github.com/U1F30C/plumeto">
-            <code className={styles.code}>
-              <img src="/github.svg" width="32px" />
-              Plumeto
-            </code>
-          </a>
-        </p>
-      </div>
+    <div className={styles.app}>
+      <header className={styles.bar}>
+        <h1 className={styles.title}>Plumeto</h1>
 
-      <div className={styles.center}>
-        <Draw lines={lines} count={visibleCount} />
-        <div>
-          <button onClick={runScript} className={styles.button}>
-            Run
-          </button>
-          <button onClick={reset} className={styles.button}>
-            Reset
-          </button>
-
-          <label>
-            Speed{" "}
-            <select value={speed} onChange={(e) => setSpeed(e.target.value as Speed)}>
-              {Object.keys(speeds).map((name) => (
-                <option key={name}>{name}</option>
-              ))}
-            </select>
-          </label>
-
-          <select onChange={(e) => setScript(e.target.value)}>
-            {examples.map((example) => (
-              <option key={example.fileName} value={example.fileContents}>
-                {example.fileName}
-              </option>
+        <button onClick={runScript} className={`${styles.button} ${styles.primary}`} title="Run the script (starts a fresh drawing)">
+          ▶ Run
+        </button>
+        <button onClick={stopAnimation} disabled={!animating} className={styles.button} title="Stop drawing, keep what's drawn so far">
+          ■ Stop
+        </button>
+        <button onClick={clear} className={styles.button} title="Stop and clear the canvas">
+          ✕ Clear
+        </button>
+        <label className={styles.speed}>
+          Speed
+          <select className={styles.select} value={speed} onChange={(e) => setSpeed(e.target.value as Speed)}>
+            {Object.keys(speeds).map((name) => (
+              <option key={name}>{name}</option>
             ))}
           </select>
+        </label>
+        <button
+          onClick={toggleTheme}
+          className={styles.iconButton}
+          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+        >
+          {theme === "dark" ? "☀" : "☾"}
+        </button>
+        <a className={styles.iconButton} href="https://github.com/U1F30C/plumeto" aria-label="Plumeto on GitHub" title="Plumeto on GitHub">
+          <span className={styles.githubIcon} />
+        </a>
+      </header>
+
+      <main className={styles.stage}>
+        <Draw className={styles.canvas} lines={lines} count={visibleCount} theme={theme} left={panelRight} />
+
+        <section className={styles.panel} ref={panelRef} aria-label="Script editor">
+          <div className={styles.panelHeader}>
+            <select className={styles.select} onChange={(e) => setScript(e.target.value)}>
+              {examples.map((example) => (
+                <option key={example.fileName} value={example.fileContents}>
+                  {example.fileName}
+                </option>
+              ))}
+            </select>
+          </div>
           <CodeMirror
-            className={styles.codeBox}
+            className={styles.editor}
             value={script}
             onChange={setScript}
             extensions={editorExtensions}
+            theme={theme}
+            height="100%"
             onCreateEditor={(view) => {
               editorRef.current = view;
             }}
@@ -163,8 +191,8 @@ export default function App() {
               : {error.message}
             </p>
           )}
-        </div>
-      </div>
-    </main>
+        </section>
+      </main>
+    </div>
   );
 }
