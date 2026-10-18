@@ -11,8 +11,11 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/language": "^6.12.4",
     "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.0",
+    "@codemirror/view": "^6.43.5",
+    "@lezer/highlight": "^1.2.3",
     "@types/numjs": "^0.16.7",
     "@uiw/react-codemirror": "^4.21.21",
     "numjs": "^0.16.1",

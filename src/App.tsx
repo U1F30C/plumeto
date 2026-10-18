@@ -4,13 +4,14 @@ import { execute } from "@/language/execute";
 import { PlumetoError } from "@/language/errors";
 import styles from "@/styles/Home.module.css";
 import CodeMirror, { EditorView } from '@uiw/react-codemirror';
-import { useEffect, useRef, useState } from "react";
-import { javascript } from '@codemirror/lang-javascript';
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Diagnostic, setDiagnostics } from '@codemirror/lint';
-import { examples } from "@/examples";
+import { ExampleFile, examples } from "@/examples";
+import { ExampleMenu } from "@/components/ExampleMenu";
+import { editorExtensions, editorTheme } from "@/editor";
 import { useTheme } from "@/theme";
 
-const editorExtensions = [javascript({ jsx: true })]
+const defaultExample = examples.find((example) => example.fileName === "cloud.plm") ?? examples[0];
 
 // lines drawn per animation frame
 const speeds = {
@@ -22,13 +23,10 @@ const speeds = {
 type Speed = keyof typeof speeds;
 
 export default function App() {
-  const [script, setScript] = useState(`for x in 1..12 {
-    for y in 1..60 {
-      rotate y deg
-      forward 5
-    }
-  }
-  `);
+  const [loadedExample, setLoadedExample] = useState<ExampleFile>(defaultExample);
+  const [script, setScript] = useState(defaultExample.fileContents);
+  const modified = script !== loadedExample.fileContents;
+  const [editorOpen, setEditorOpen] = useState(true);
 
   const [lines, setLines] = useState<LineSegment[]>([]);
   const [visibleCount, setVisibleCount] = useState(0);
@@ -109,6 +107,18 @@ export default function App() {
     view.focus();
   }
 
+  function loadExample(example: ExampleFile) {
+    if (modified && !confirm(`Discard your changes to ${loadedExample.fileName}?`)) return;
+    setLoadedExample(example);
+    setScript(example.fileContents);
+    showError(null);
+  }
+
+  // the editor's keymap is created once, so it calls whatever runScript is current
+  const runRef = useRef(runScript);
+  runRef.current = runScript;
+  const extensions = useMemo(() => editorExtensions(() => runRef.current()), []);
+
   function runScript() {
     const buffer: LineSegment[] = [];
     try {
@@ -130,7 +140,7 @@ export default function App() {
       <header className={styles.bar}>
         <h1 className={styles.title}>Plumeto</h1>
 
-        <button onClick={runScript} className={`${styles.button} ${styles.primary}`} title="Run the script (starts a fresh drawing)">
+        <button onClick={runScript} className={`${styles.button} ${styles.primary}`} title="Run the script, starts a fresh drawing (Ctrl+Enter)">
           ▶ Run
         </button>
         <button onClick={stopAnimation} disabled={!animating} className={styles.button} title="Stop drawing, keep what's drawn so far">
@@ -163,22 +173,30 @@ export default function App() {
       <main className={styles.stage}>
         <Draw className={styles.canvas} lines={lines} count={visibleCount} theme={theme} left={panelRight} />
 
-        <section className={styles.panel} ref={panelRef} aria-label="Script editor">
+        {!editorOpen && (
+          <button className={`${styles.button} ${styles.showEditor}`} onClick={() => setEditorOpen(true)} title="Show the editor">
+            » Code
+          </button>
+        )}
+
+        <section className={styles.panel} ref={panelRef} hidden={!editorOpen} aria-label="Script editor">
           <div className={styles.panelHeader}>
-            <select className={styles.select} onChange={(e) => setScript(e.target.value)}>
-              {examples.map((example) => (
-                <option key={example.fileName} value={example.fileContents}>
-                  {example.fileName}
-                </option>
-              ))}
-            </select>
+            <ExampleMenu
+              examples={examples}
+              currentName={loadedExample.fileName}
+              modified={modified}
+              onSelect={loadExample}
+            />
+            <button className={styles.collapse} onClick={() => setEditorOpen(false)} title="Hide the editor" aria-label="Hide the editor">
+              «
+            </button>
           </div>
           <CodeMirror
             className={styles.editor}
             value={script}
             onChange={setScript}
-            extensions={editorExtensions}
-            theme={theme}
+            extensions={extensions}
+            theme={editorTheme}
             height="100%"
             onCreateEditor={(view) => {
               editorRef.current = view;

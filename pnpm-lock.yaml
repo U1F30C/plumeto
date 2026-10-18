@@ -8,12 +8,21 @@ importers:
 
   .:
     dependencies:
-      '@codemirror/lang-javascript':
-        specifier: ^6.2.1
-        version: 6.2.5
+      '@codemirror/language':
+        specifier: ^6.12.4
+        version: 6.12.4
       '@codemirror/lint':
         specifier: ^6.9.7
         version: 6.9.7
+      '@codemirror/state':
+        specifier: ^6.7.0
+        version: 6.7.0
+      '@codemirror/view':
+        specifier: ^6.43.5
+        version: 6.43.5
+      '@lezer/highlight':
+        specifier: ^1.2.3
+        version: 1.2.3
       '@types/numjs':
         specifier: ^0.16.7
         version: 0.16.8
@@ -151,9 +160,6 @@ packages:
 
   '@codemirror/commands@6.10.4':
     resolution: {integrity: sha512-Ryk9y9T0FFVF0cUGhAknveAyUOl/A1qReTFi+qPKtOh2Z9F4AUBz3XOrYD4ZEgZirdugVzHvd/2/Wcwy5OliTg==}
-
-  '@codemirror/lang-javascript@6.2.5':
-    resolution: {integrity: sha512-zD4e5mS+50htS7F+TYjBPsiIFGanfVqg4HyUz6WNFikgOPf2BgKlx+TQedI1w6n/IqRBVBbBWmGFdLB/7uxO4A==}
 
   '@codemirror/language@6.12.4':
     resolution: {integrity: sha512-1q4PaT+o6PbgpkJt4Q8Fv5XJxTy4FUZ4MWETtyiDw3J0Pyr9E2vqcKL+k9wcvjNTIsauxvE7OfmWj3FRPHQ76A==}
@@ -332,9 +338,6 @@ packages:
 
   '@lezer/highlight@1.2.3':
     resolution: {integrity: sha512-qXdH7UqTvGfdVBINrgKhDsVTJTxactNNxLk7+UMwZhU13lMHaOBlJe9Vqp907ya56Y3+ed2tlqzys7jDkTmW0g==}
-
-  '@lezer/javascript@1.5.4':
-    resolution: {integrity: sha512-vvYx3MhWqeZtGPwDStM2dwgljd5smolYD2lR2UyFcHfxbBQebqx8yjmFmxtJ/E6nN6u1D9srOiVWm3Rb4tmcUA==}
 
   '@lezer/lr@1.4.10':
     resolution: {integrity: sha512-rnCpTIBafOx4mRp43xOxDJbFipJm/c0cia/V5TiGlhmMa+wsSdoGmUN3w5Bqrks/09Q/D4tNAmWaT8p6NRi77A==}
@@ -1485,16 +1488,6 @@ snapshots:
       '@codemirror/view': 6.43.5
       '@lezer/common': 1.5.2
 
-  '@codemirror/lang-javascript@6.2.5':
-    dependencies:
-      '@codemirror/autocomplete': 6.20.3
-      '@codemirror/language': 6.12.4
-      '@codemirror/lint': 6.9.7
-      '@codemirror/state': 6.7.0
-      '@codemirror/view': 6.43.5
-      '@lezer/common': 1.5.2
-      '@lezer/javascript': 1.5.4
-
   '@codemirror/language@6.12.4':
     dependencies:
       '@codemirror/state': 6.7.0
@@ -1627,12 +1620,6 @@ snapshots:
   '@lezer/highlight@1.2.3':
     dependencies:
       '@lezer/common': 1.5.2
-
-  '@lezer/javascript@1.5.4':
-    dependencies:
-      '@lezer/common': 1.5.2
-      '@lezer/highlight': 1.2.3
-      '@lezer/lr': 1.4.10
 
   '@lezer/lr@1.4.10':
     dependencies:
