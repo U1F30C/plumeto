@@ -21,23 +21,26 @@ See `examples/` folder.
 
 ## Development
 
-Plumeto is built with Next.js, [peggy](https://github.com/peggyjs/peggy) for parser generation and [roughjs](https://github.com/rough-stuff/rough) to draw on canvas in a sketchy style.
+Plumeto is built with React and [Vite](https://vitejs.dev), [peggy](https://github.com/peggyjs/peggy) for parser generation and [roughjs](https://github.com/rough-stuff/rough) to draw on canvas in a sketchy style.
 
-To run the development server:
+Install dependencies and run the development server:
 
 ```bash
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+The app lives in `src/App.tsx` and the language (grammar, AST types and interpreter) in `src/language/`. The page auto-updates as you edit.
 
 If you make changes to the grammar in `src/language/grammar.pegjs` update the generated parser by running
 
 ```bash
-npm run grammar
+pnpm grammar
 ```
+
+`pnpm build` regenerates the parser and builds the site into `dist/`.
 
 ## Tests
 
@@ -58,12 +61,14 @@ node cli/bin.js examples/spiral.plm -o out.svg
 
 ## Roadmap
 - Language
-  - Fix parsing bugs in general
-  - Turing completeness (only needs memory?)
+  - Data structures (lists), mainly to make L-systems easier to write
+  - Local variables: assignments inside a function are global today (by design), consider a way to keep them local
+  - Line numbers in runtime errors (e.g. unknown identifier or function)
+  - Allow continuing an expression on the next line after an operator
   - Other cool stuff
 - UX
+  - Show parse and runtime errors in the editor, pointing at the line
   - Fix styles
   - Fix dark mode
   - Panning
-  - Handle parsing errors
   - Colors
