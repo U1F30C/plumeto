@@ -64,6 +64,9 @@ node cli/bin.js examples/basics/spiral.plm -o out.svg
   - Data structures (lists), mainly to make L-systems easier to write
   - Local variables: assignments inside a function are global today (by design), consider a way to keep them local
   - Allow continuing an expression on the next line after an operator
+  - Allow line breaks inside command arguments, e.g. after the comma in `place x, y` (function calls already allow them)
+  - A way to read the cursor's position and direction, so scripts don't have to track them in variables
+  - A `pi` constant
   - Colors, e.g. a `color red` command (needs the interpreter, canvas and CLI to carry a color per line)
   - Other cool stuff
 - UX
