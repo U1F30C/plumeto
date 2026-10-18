@@ -10,6 +10,8 @@ import { ExampleFile, examples } from "@/examples";
 import { ExampleMenu } from "@/components/ExampleMenu";
 import { editorExtensions, editorTheme } from "@/editor";
 import { useTheme } from "@/theme";
+import { loadSavedScript, saveScript } from "@/storage";
+import { decodeScript, encodeScript } from "@/share";
 
 const defaultExample = examples.find((example) => example.fileName === "cloud.plm") ?? examples[0];
 
@@ -23,9 +25,12 @@ const speeds = {
 type Speed = keyof typeof speeds;
 
 export default function App() {
-  const [loadedExample, setLoadedExample] = useState<ExampleFile>(defaultExample);
-  const [script, setScript] = useState(defaultExample.fileContents);
+  // restore what was in the editor last time, otherwise start with the default example
+  const [initial] = useState(() => loadSavedScript() ?? { loaded: defaultExample, script: defaultExample.fileContents });
+  const [loadedExample, setLoadedExample] = useState<ExampleFile>(initial.loaded);
+  const [script, setScript] = useState(initial.script);
   const modified = script !== loadedExample.fileContents;
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
   const [editorOpen, setEditorOpen] = useState(true);
 
   const [lines, setLines] = useState<LineSegment[]>([]);
@@ -107,6 +112,43 @@ export default function App() {
     view.focus();
   }
 
+  useEffect(() => {
+    saveScript({ loaded: loadedExample, script });
+  }, [loadedExample, script]);
+
+  // a shared link carries its script in the URL: load it, run it, then drop it from the
+  // address bar so a reload doesn't throw away edits made since
+  const sharedLinkHandled = useRef(false);
+  useEffect(() => {
+    if (sharedLinkHandled.current) return;
+    sharedLinkHandled.current = true;
+    const encoded = new URLSearchParams(location.hash.slice(1)).get("code");
+    if (encoded === null) return;
+    history.replaceState(null, "", location.pathname + location.search);
+    decodeScript(encoded).then((shared) => {
+      if (shared === null) {
+        alert("This shared link is damaged, so its script couldn't be loaded.");
+        return;
+      }
+      if (modified && !confirm(`Replace your changes to ${loadedExample.fileName} with the shared script?`)) return;
+      setLoadedExample({ fileName: "shared.plm", fileContents: shared });
+      setScript(shared);
+      runScript(shared);
+    });
+  }, []);
+
+  async function share() {
+    const url = `${location.origin}${location.pathname}#code=${await encodeScript(script)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareStatus("copied");
+      setTimeout(() => setShareStatus("idle"), 2000);
+    } catch {
+      // the clipboard can be unavailable (permissions, insecure origin); let them copy it by hand
+      prompt("Copy this link to share your script:", url);
+    }
+  }
+
   function loadExample(example: ExampleFile) {
     if (modified && !confirm(`Discard your changes to ${loadedExample.fileName}?`)) return;
     setLoadedExample(example);
@@ -119,10 +161,10 @@ export default function App() {
   runRef.current = runScript;
   const extensions = useMemo(() => editorExtensions(() => runRef.current()), []);
 
-  function runScript() {
+  function runScript(source = script) {
     const buffer: LineSegment[] = [];
     try {
-      execute(script, (line) => {
+      execute(source, (line) => {
         buffer.push(line);
       });
       showError(null);
@@ -140,7 +182,7 @@ export default function App() {
       <header className={styles.bar}>
         <h1 className={styles.title}>Plumeto</h1>
 
-        <button onClick={runScript} className={`${styles.button} ${styles.primary}`} title="Run the script, starts a fresh drawing (Ctrl+Enter)">
+        <button onClick={() => runScript()} className={`${styles.button} ${styles.primary}`} title="Run the script, starts a fresh drawing (Ctrl+Enter)">
           ▶ Run
         </button>
         <button onClick={stopAnimation} disabled={!animating} className={styles.button} title="Stop drawing, keep what's drawn so far">
@@ -157,6 +199,14 @@ export default function App() {
             ))}
           </select>
         </label>
+        <button
+          onClick={share}
+          className={styles.iconButton}
+          aria-label={shareStatus === "copied" ? "Link copied" : "Share: copy a link that opens this script"}
+          title={shareStatus === "copied" ? "Link copied" : "Share: copy a link that opens this script"}
+        >
+          {shareStatus === "copied" ? "✓" : "⇪"}
+        </button>
         <button
           onClick={toggleTheme}
           className={styles.iconButton}
