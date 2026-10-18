@@ -8,6 +8,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Diagnostic, setDiagnostics } from '@codemirror/lint';
 import { ExampleFile, examples } from "@/examples";
 import { ExampleMenu } from "@/components/ExampleMenu";
+import { MoreMenu } from "@/components/MoreMenu";
+import { useMediaQuery } from "@/useMediaQuery";
 import { editorExtensions, editorTheme } from "@/editor";
 import { useTheme } from "@/theme";
 import { loadSavedScript, saveScript } from "@/storage";
@@ -32,6 +34,9 @@ export default function App() {
   const modified = script !== loadedExample.fileContents;
   const [shareStatus, setShareStatus] = useState<"idle" | "copied">("idle");
   const [editorOpen, setEditorOpen] = useState(true);
+  // small screens show either the code or the drawing, with secondary actions in a ☰ menu
+  const compact = useMediaQuery("(max-width: 720px)");
+  const [compactView, setCompactView] = useState<"code" | "drawing">("code");
 
   const [lines, setLines] = useState<LineSegment[]>([]);
   const [visibleCount, setVisibleCount] = useState(0);
@@ -163,6 +168,7 @@ export default function App() {
 
   function runScript(source = script) {
     const buffer: LineSegment[] = [];
+    let failed = false;
     try {
       execute(source, (line) => {
         buffer.push(line);
@@ -171,65 +177,117 @@ export default function App() {
     } catch (e) {
       // lines drawn before a runtime error are still shown, which helps to see how far it got
       showError(e instanceof PlumetoError ? e : new PlumetoError(String(e), "runtime"));
+      failed = true;
     }
+    // on small screens, show the drawing, or stay on the code when there's an error to read
+    setCompactView(failed ? "code" : "drawing");
     setLines(buffer);
     setVisibleCount(0);
     animate(buffer.length);
   }
 
+  const runButton = (
+    <button onClick={() => runScript()} className={`${styles.button} ${styles.primary}`} title="Run the script, starts a fresh drawing (Ctrl+Enter)">
+      ▶ Run
+    </button>
+  );
+  const speedSelect = (
+    <label className={styles.speed}>
+      Speed
+      <select className={styles.select} value={speed} onChange={(e) => setSpeed(e.target.value as Speed)}>
+        {Object.keys(speeds).map((name) => (
+          <option key={name}>{name}</option>
+        ))}
+      </select>
+    </label>
+  );
+  const shareLabel = shareStatus === "copied" ? "Link copied" : "Share: copy a link that opens this script";
+  const themeLabel = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+  const githubUrl = "https://github.com/U1F30C/plumeto";
+
+  const errorMessage = error && (
+    <p className={styles.error} role="alert" onClick={goToError}>
+      <strong>{error.kind === "syntax" ? "Syntax error" : "Runtime error"}</strong>
+      {error.location && ` on line ${error.location.start.line}, column ${error.location.start.column}`}
+      : {error.message}
+    </p>
+  );
+
+  const editorVisible = compact ? compactView === "code" : editorOpen;
+
   return (
     <div className={styles.app}>
-      <header className={styles.bar}>
-        <h1 className={styles.title}>Plumeto</h1>
+      {compact ? (
+        <header className={`${styles.bar} ${styles.compactBar}`}>
+          <h1 className={styles.title}>Plumeto</h1>
+          <div className={styles.switch} role="group" aria-label="Show">
+            <button className={styles.switchOption} aria-pressed={compactView === "code"} onClick={() => setCompactView("code")}>
+              Code
+              {error && <span className={styles.errorDot} aria-label="has an error">●</span>}
+            </button>
+            <button className={styles.switchOption} aria-pressed={compactView === "drawing"} onClick={() => setCompactView("drawing")}>
+              Drawing
+            </button>
+          </div>
+          {runButton}
+          {animating && (
+            <button onClick={stopAnimation} className={styles.iconButton} aria-label="Stop drawing" title="Stop drawing, keep what's drawn so far">
+              ■
+            </button>
+          )}
+          <MoreMenu>
+            <button className={styles.moreItem} onClick={clear}>✕ Clear the canvas</button>
+            <div className={styles.moreItem}>{speedSelect}</div>
+            <button className={styles.moreItem} onClick={share} data-keep-open>
+              {shareStatus === "copied" ? "✓ Link copied" : "⇪ Share a link"}
+            </button>
+            <button className={styles.moreItem} onClick={toggleTheme}>
+              {theme === "dark" ? "☀ Light theme" : "☾ Dark theme"}
+            </button>
+            <a className={styles.moreItem} href={githubUrl}>
+              <span className={styles.githubIcon} /> Plumeto on GitHub
+            </a>
+          </MoreMenu>
+        </header>
+      ) : (
+        <header className={styles.bar}>
+          <h1 className={styles.title}>Plumeto</h1>
 
-        <button onClick={() => runScript()} className={`${styles.button} ${styles.primary}`} title="Run the script, starts a fresh drawing (Ctrl+Enter)">
-          ▶ Run
-        </button>
-        <button onClick={stopAnimation} disabled={!animating} className={styles.button} title="Stop drawing, keep what's drawn so far">
-          ■ Stop
-        </button>
-        <button onClick={clear} className={styles.button} title="Stop and clear the canvas">
-          ✕ Clear
-        </button>
-        <label className={styles.speed}>
-          Speed
-          <select className={styles.select} value={speed} onChange={(e) => setSpeed(e.target.value as Speed)}>
-            {Object.keys(speeds).map((name) => (
-              <option key={name}>{name}</option>
-            ))}
-          </select>
-        </label>
-        <button
-          onClick={share}
-          className={styles.iconButton}
-          aria-label={shareStatus === "copied" ? "Link copied" : "Share: copy a link that opens this script"}
-          title={shareStatus === "copied" ? "Link copied" : "Share: copy a link that opens this script"}
-        >
-          {shareStatus === "copied" ? "✓" : "⇪"}
-        </button>
-        <button
-          onClick={toggleTheme}
-          className={styles.iconButton}
-          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-          title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-        >
-          {theme === "dark" ? "☀" : "☾"}
-        </button>
-        <a className={styles.iconButton} href="https://github.com/U1F30C/plumeto" aria-label="Plumeto on GitHub" title="Plumeto on GitHub">
-          <span className={styles.githubIcon} />
-        </a>
-      </header>
+          {runButton}
+          <button onClick={stopAnimation} disabled={!animating} className={styles.button} title="Stop drawing, keep what's drawn so far">
+            ■ Stop
+          </button>
+          <button onClick={clear} className={styles.button} title="Stop and clear the canvas">
+            ✕ Clear
+          </button>
+          {speedSelect}
+          <button onClick={share} className={styles.iconButton} aria-label={shareLabel} title={shareLabel}>
+            {shareStatus === "copied" ? "✓" : "⇪"}
+          </button>
+          <button onClick={toggleTheme} className={styles.iconButton} aria-label={themeLabel} title={themeLabel}>
+            {theme === "dark" ? "☀" : "☾"}
+          </button>
+          <a className={styles.iconButton} href={githubUrl} aria-label="Plumeto on GitHub" title="Plumeto on GitHub">
+            <span className={styles.githubIcon} />
+          </a>
+        </header>
+      )}
 
       <main className={styles.stage}>
-        <Draw className={styles.canvas} lines={lines} count={visibleCount} theme={theme} left={panelRight} />
+        <Draw className={styles.canvas} lines={lines} count={visibleCount} theme={theme} left={compact ? 0 : panelRight} />
 
-        {!editorOpen && (
+        {!compact && !editorOpen && (
           <button className={`${styles.button} ${styles.showEditor}`} onClick={() => setEditorOpen(true)} title="Show the editor">
             » Code
           </button>
         )}
 
-        <section className={styles.panel} ref={panelRef} hidden={!editorOpen} aria-label="Script editor">
+        <section
+          className={`${styles.panel} ${compact ? styles.compactPanel : ""}`}
+          ref={panelRef}
+          hidden={!editorVisible}
+          aria-label="Script editor"
+        >
           <div className={styles.panelHeader}>
             <ExampleMenu
               examples={examples}
@@ -237,9 +295,11 @@ export default function App() {
               modified={modified}
               onSelect={loadExample}
             />
-            <button className={styles.collapse} onClick={() => setEditorOpen(false)} title="Hide the editor" aria-label="Hide the editor">
-              «
-            </button>
+            {!compact && (
+              <button className={styles.collapse} onClick={() => setEditorOpen(false)} title="Hide the editor" aria-label="Hide the editor">
+                «
+              </button>
+            )}
           </div>
           <CodeMirror
             className={styles.editor}
@@ -252,13 +312,7 @@ export default function App() {
               editorRef.current = view;
             }}
           />
-          {error && (
-            <p className={styles.error} role="alert" onClick={goToError}>
-              <strong>{error.kind === "syntax" ? "Syntax error" : "Runtime error"}</strong>
-              {error.location && ` on line ${error.location.start.line}, column ${error.location.start.column}`}
-              : {error.message}
-            </p>
-          )}
+          {errorMessage}
         </section>
       </main>
     </div>

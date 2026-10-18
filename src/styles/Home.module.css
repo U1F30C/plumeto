@@ -272,3 +272,103 @@
   border-radius: 12px 4px 10px 6px / 6px 10px 4px 12px;
   cursor: pointer;
 }
+
+/* ---------- small screens ---------- */
+
+.compactBar {
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+}
+
+.compactBar .title {
+  font-size: 1.6rem;
+}
+
+.compactBar .button {
+  padding: 0.3rem 0.7rem;
+  white-space: nowrap;
+}
+
+.switch {
+  display: flex;
+  border: 2px solid var(--ink);
+  border-radius: var(--sketch-radius);
+  overflow: hidden;
+}
+
+.switchOption {
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--panel);
+  border: none;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.switchOption[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.switchOption:focus-visible {
+  outline: 2px dashed var(--accent);
+  outline-offset: -4px;
+}
+
+.errorDot {
+  margin-left: 0.25rem;
+  color: var(--error);
+  font-size: 0.75em;
+}
+
+.compactPanel {
+  top: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  width: auto;
+}
+
+.moreList {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 10;
+  min-width: 14rem;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.4rem;
+  background: var(--panel);
+  border: 2px solid var(--ink);
+  border-radius: var(--sketch-radius-panel);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.moreItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.moreItem:hover,
+a.moreItem:hover {
+  background: var(--active-line);
+}
+
+.moreItem:focus-visible {
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
+}
