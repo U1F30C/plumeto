@@ -37,14 +37,15 @@ WhileBlock = "while" KeywordEnd _ condition:BooleanExpression __ body:Block { re
 ForBlock = "for" KeywordEnd _ variable:Identifier _ "in" KeywordEnd _ range:RangeExpression __ body:Block { return { type: "for", variable, range, body } }
 IfBlock = "if" KeywordEnd _ condition:BooleanExpression __ body:Block elseBody:(__ @ElseBlock)? { return { type: "if", condition, body, else: elseBody ?? null } }
 ElseBlock = "else" KeywordEnd __ body:Block { return body }
-FunctionDefinition = "function" KeywordEnd _ name:Identifier _ "(" __ parameters:FunctionParameters __ ")" __ body:Block { return { type: "functionDefinition", name: name.name, parameters, body } }
+    / "else" KeywordEnd _ elseIf:IfBlock { return [elseIf] }
+FunctionDefinition = "function" KeywordEnd _ name:Identifier _ "(" __ parameters:FunctionParameters? __ ")" __ body:Block { return { type: "functionDefinition", name: name.name, parameters: parameters ?? [], body } }
 FunctionParameters = head:Identifier tail:(__ "," __ Identifier)* { return [head].concat(tail.map(child => child[3])) }
 Block = "{" __ body:Statements? __ "}" { return body ?? [] }
 
 Expression = BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }
 
-FunctionCall = name:Identifier _ "(" __ functionArguments:FunctionArguments __ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments } }
+FunctionCall = name:Identifier _ "(" __ functionArguments:FunctionArguments? __ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments ?? [] } }
 FunctionArguments = head:Expression tail:(__ "," __ Expression)* { return [head].concat(tail.map(child => child[3])) }
 
 ArithmeticExpression = AdditionExpression / ParenthesizedExpression
@@ -83,10 +84,10 @@ IdentifierChar = [A-Za-z0-9_]
 // keywords must not run into a name, so forward_line(3) is a call rather than "forward _line(3)"
 KeywordEnd = !IdentifierChar
 
-Number = sign:Sign? int:DigitSequence decimal:DecimalPart? { return { type: "number", value: parseFloat((sign ?? "") + int + decimal, 10) } }
+Number = value:$(Sign? (DigitSequence DecimalPart? / DecimalPart)) { return { type: "number", value: parseFloat(value) } }
 Sign = "+" / "-"
-DecimalPart = "." digits:DigitSequence { return "." + digits }
-DigitSequence = digits:[0-9]+ { return digits.join("") }
+DecimalPart = "." DigitSequence
+DigitSequence = [0-9]+
 
 // BooleanConstant = "true" / "false" { return { type: "boolean", value: text === "true" } }
 
