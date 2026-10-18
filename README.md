@@ -39,6 +39,14 @@ If you make changes to the grammar in `src/language/grammar.pegjs` update the ge
 npm run grammar
 ```
 
+## Tests
+
+```bash
+pnpm test
+```
+
+Tests live in `tests/`, mirroring `src/`. `tests/language/examples.test.ts` fingerprints the drawing of every script in `examples/`. If a change to one is intended, update the snapshots with `pnpm test -u`.
+
 ## CLI
 
 Render a `.plm` script to SVG from the command line:
@@ -50,11 +58,7 @@ node cli/bin.js examples/spiral.plm -o out.svg
 
 ## Roadmap
 - Language
-  - Fix expression bug where it doesn't accept expected expressions such as
-    - a*4+sin(x)
   - Fix parsing bugs in general
-  - Add comments support
-  - Fix return statements, they don't work if nested.
   - Turing completeness (only needs memory?)
   - Other cool stuff
 - UX
@@ -63,4 +67,3 @@ node cli/bin.js examples/spiral.plm -o out.svg
   - Panning
   - Handle parsing errors
   - Colors
-- Tests

@@ -10,7 +10,6 @@ import {
   ForwardCommandStatement,
   FunctionCall,
   FunctionDefinitionStatement,
-  FunctionStatement,
   IfStatement,
   Operation,
   PlaceCommandStatement,
@@ -23,6 +22,8 @@ import {
 } from "./program";
 
 export type LineSegment = [number, number, number, number];
+
+type Completion = { value: number | boolean } | undefined;
 
 interface ExecutionContext {
   symbols: Record<string, any>;
@@ -68,38 +69,35 @@ export class ProgramRunner {
   run(program: Program, addLine: (line: LineSegment) => void) {
     this.ctx = this.newContext();
     this.addLine = addLine;
-    this.executeStatements(program.body);
-  }
-
-  executeStatements(statements: Statement[]) {
-    for (let statement of statements) {
-      this.executeStatement(statement);
+    if (this.executeStatements(program.body)) {
+      throw new Error("return used outside of a function");
     }
   }
 
-  executeFunctionStatements(statements: FunctionStatement[]) {
+  // a Completion is set when a return statement ran, and carries its value up
+  // through enclosing blocks until the function call that consumes it
+  executeStatements(statements: Statement[]): Completion {
     for (let statement of statements) {
-      if (statement.type === "return") {
-        return this.resolveExpression(statement.expression);
+      const completion = this.executeStatement(statement);
+      if (completion) {
+        return completion;
       }
-      this.executeStatement(statement);
     }
   }
 
-  executeStatement(statement: Statement) {
+  executeStatement(statement: Statement): Completion {
     switch (statement.type) {
       case "assignment":
         this.executeAssignmentStatement(statement);
         break;
       case "while":
-        this.executeWhileStatement(statement);
-        break;
+        return this.executeWhileStatement(statement);
       case "for":
-        this.executeForStatement(statement);
-        break;
+        return this.executeForStatement(statement);
       case "if":
-        this.executeIfStatement(statement);
-        break;
+        return this.executeIfStatement(statement);
+      case "return":
+        return { value: this.resolveExpression(statement.expression) };
       case "command":
         this.executeCommandStatement(statement);
         break;
@@ -114,24 +112,30 @@ export class ProgramRunner {
   executeFunctionDefinitionStatement(statement: FunctionDefinitionStatement) {
     this.ctx.functionDefinitions[statement.name] = statement;
   }
-  executeIfStatement(statement: IfStatement) {
+  executeIfStatement(statement: IfStatement): Completion {
     if (this.resolveBooleanExpression(statement.condition)) {
-      this.executeStatements(statement.body);
+      return this.executeStatements(statement.body);
     } else if (statement.else) {
-      this.executeStatements(statement.else);
+      return this.executeStatements(statement.else);
     }
   }
-  executeWhileStatement(statement: WhileStatement) {
+  executeWhileStatement(statement: WhileStatement): Completion {
     while (this.resolveBooleanExpression(statement.condition)) {
-      this.executeStatements(statement.body);
+      const completion = this.executeStatements(statement.body);
+      if (completion) {
+        return completion;
+      }
     }
   }
-  executeForStatement(statement: ForStatement) {
+  executeForStatement(statement: ForStatement): Completion {
     const [start, end] = this.resolveRangeExpression(statement.range);
     const direction = start < end ? 1 : -1;
     for (let i = start; i * direction <= end * direction; i += direction) {
       this.ctx.symbols[statement.variable.name] = i;
-      this.executeStatements(statement.body);
+      const completion = this.executeStatements(statement.body);
+      if (completion) {
+        return completion;
+      }
     }
   }
   resolveRangeExpression(range: RangeExpression): [number, number] {
@@ -141,9 +145,10 @@ export class ProgramRunner {
     ];
   }
   executeAssignmentStatement(statement: AssignmentStatement) {
-    this.ctx.symbols[statement.left.name] = this.resolveExpression(
-      statement.right
-    );
+    // resolve first: function calls replace this.ctx, so reading
+    // this.ctx.symbols beforehand would write into the stale context
+    const value = this.resolveExpression(statement.right);
+    this.ctx.symbols[statement.left.name] = value;
   }
 
   executeCommandStatement(statement: CommandStatement) {
@@ -271,7 +276,7 @@ export class ProgramRunner {
     }
     const oldCtx = this.ctx;
     this.ctx = newCtx;
-    const returnValue = this.executeFunctionStatements(definition.body);
+    const returnValue = this.executeStatements(definition.body)?.value;
     for (const parameter of definition.parameters) {
       delete newCtx.symbols[parameter.name];
     }

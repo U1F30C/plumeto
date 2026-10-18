@@ -33,7 +33,7 @@ export interface FunctionDefinitionStatement {
   type: "functionDefinition";
   name: string;
   parameters: Identifier[];
-  body: FunctionStatement[];
+  body: Statement[];
 }
 
 export type Statement =
@@ -43,9 +43,8 @@ export type Statement =
   | CommandStatement
   | IfStatement
   | FunctionDefinitionStatement
+  | ReturnStatement
   | Expression;
-
-export type FunctionStatement = Statement | ReturnStatement;
 
 export interface ReturnStatement {
   type: "return";

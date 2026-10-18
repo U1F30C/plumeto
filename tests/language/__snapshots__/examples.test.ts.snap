@@ -1,0 +1,155 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`examples > cloud.plm 1`] = `
+{
+  "hash": "659ac79c846ba2348e5d0dce2ab0ab1af33dd5d3",
+  "segments": 720,
+}
+`;
+
+exports[`examples > elipse.plm 1`] = `
+{
+  "hash": "7ae6009f26fd4a8b671a1e28a4c13f2dc0aedad6",
+  "segments": 36,
+}
+`;
+
+exports[`examples > golden-flower.plm 1`] = `
+{
+  "hash": "1170c0164a6ab75c17032d69c22a4b60622e600b",
+  "segments": 1584,
+}
+`;
+
+exports[`examples > golden-portal.plm 1`] = `
+{
+  "hash": "06c99b3b9248b7c6022dec96f8647fd3b84f9667",
+  "segments": 1332,
+}
+`;
+
+exports[`examples > golden-symetrical-circle.plm 1`] = `
+{
+  "hash": "d4310b449e6a55054023171e65b53c712cbc5c68",
+  "segments": 620,
+}
+`;
+
+exports[`examples > golden-tentacle.plm 1`] = `
+{
+  "hash": "1044e7b10f798c7cc6764de757f58476234bd390",
+  "segments": 440,
+}
+`;
+
+exports[`examples > grid.plm 1`] = `
+{
+  "hash": "691fdccb95b7de7b1c39e19fb717acb9fad474d2",
+  "segments": 510,
+}
+`;
+
+exports[`examples > hexpiral.plm 1`] = `
+{
+  "hash": "eef64ecbd9cb5bdbba192a6d1bf667a6eab61f93",
+  "segments": 100,
+}
+`;
+
+exports[`examples > honeycomb.plm 1`] = `
+{
+  "hash": "6cddb40d3278445e877cb74ba05f580952cd8b89",
+  "segments": 528,
+}
+`;
+
+exports[`examples > interlaced.plm 1`] = `
+{
+  "hash": "e31609d3ec53ccf10bddbe5d9fad412be67974b1",
+  "segments": 6750,
+}
+`;
+
+exports[`examples > n-polygon.plm 1`] = `
+{
+  "hash": "11faede3fd46ca32f315c9abfeab690bb80e4e12",
+  "segments": 5,
+}
+`;
+
+exports[`examples > penta-doodle.plm 1`] = `
+{
+  "hash": "a2d7fe32c1c57b56f2c550dcc8175c5850b96d2f",
+  "segments": 70,
+}
+`;
+
+exports[`examples > saw.plm 1`] = `
+{
+  "hash": "aa72c3d1d3bc8214a17e94e19cc3aa0ed72c5528",
+  "segments": 72,
+}
+`;
+
+exports[`examples > shuriken.plm 1`] = `
+{
+  "hash": "0d2a3bedd5ca79db9b07179f95eba296603521a7",
+  "segments": 400,
+}
+`;
+
+exports[`examples > simple-circle.plm 1`] = `
+{
+  "hash": "36120f13257f6641e2e831b721110f62ffde6c66",
+  "segments": 360,
+}
+`;
+
+exports[`examples > spiral.plm 1`] = `
+{
+  "hash": "7c4b1c617e8b9147a0ba6c9c92a8f980e5c759d0",
+  "segments": 100,
+}
+`;
+
+exports[`examples > star.plm 1`] = `
+{
+  "hash": "2e2d7c7cf8d84a4c3ccd899936bde44b1f6c0e01",
+  "segments": 61,
+}
+`;
+
+exports[`examples > stick-saw.plm 1`] = `
+{
+  "hash": "d08af13a006eb7e379974004891079e5312abd36",
+  "segments": 192,
+}
+`;
+
+exports[`examples > weed(expanded).plm 1`] = `
+{
+  "hash": "fca45a850fab3c666b86d95443e9d37bdf23d164",
+  "segments": 360,
+}
+`;
+
+exports[`examples > weed(stochastic).plm 1`] = `
+{
+  "hash": "5bf3fb54e1a603b57dbe739f46884643958b139b",
+  "segments": 1953,
+}
+`;
+
+exports[`examples > weed(stochastic,2rounds).plm 1`] = `
+{
+  "hash": "c736e3b2aec5e0ffe79b818cbaf624f38c33cf77",
+  "segments": 4650,
+}
+`;
+
+exports[`examples > weed.plm 1`] = `
+{
+  "hash": "51f652ba63a47507c3834d23d36f92ba8edeea23",
+  "segments": 8001,
+}
+`;

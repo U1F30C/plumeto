@@ -1,5 +1,14 @@
 {
     function parseOperationList(head, tail) {
+        return tail.reduce((left, element) => ({
+            type: "operation",
+            left,
+            operator: element[1],
+            right: element[3]
+        }), head)
+    }
+
+    function parseRightAssociativeOperationList(head, tail) {
         if (tail.length === 0) {
             return head
         } else {
@@ -7,33 +16,31 @@
                 type: "operation",
                 left: head,
                 operator: tail[0][1],
-                right: parseOperationList(tail[0][3], tail.slice(1))
+                right: parseRightAssociativeOperationList(tail[0][3], tail.slice(1))
             }
         }
-        
     }
 }
 
 Program = ProgramRoot
-ProgramRoot = __ body:Statements __ { return { type: "program", body } }
+ProgramRoot = __ body:Statements? __ { return { type: "program", body: body ?? [] } }
 
 Statements = head:Statement _ tail:(Separator _ Statement _ )* {
     return [head].concat(tail.map(child => child[2]))
 }
 
-Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock / FunctionDefinition / Expression
-FunctionStatements = ReturnStatement / Statements
-ReturnStatement = "return" _ expression:Expression { return { type: "return", expression } }
+Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock / FunctionDefinition / ReturnStatement / Expression
+ReturnStatement = "return" ![A-Za-z_] _ expression:Expression { return { type: "return", expression } }
 
 Assignment = left:Identifier _ "=" _ right:Expression { return { type: "assignment", left, right } }
 WhileBlock = "while" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" { return { type: "while", condition, body } }
 ForBlock = "for" _ variable:Identifier _ "in" _ range:RangeExpression _ "{" __ body:Statements __ "}" { return { type: "for", variable, range, body } }
 IfBlock = "if" _ condition:BooleanExpression _ "{" __ body:Statements __ "}" _ elseBody:ElseBlock? { return { type: "if", condition, body, else: elseBody ?? null } }
 ElseBlock = "else" _ "{" __ body:Statements __ "}" { return body }
-FunctionDefinition = "function" _ name:Identifier _ "(" _ parameters:FunctionParameters _ ")" _ "{" __ body:FunctionStatements __ "}" { return { type: "functionDefinition", name: name.name, parameters, body } }
+FunctionDefinition = "function" _ name:Identifier _ "(" _ parameters:FunctionParameters _ ")" _ "{" __ body:Statements __ "}" { return { type: "functionDefinition", name: name.name, parameters, body } }
 FunctionParameters = head:Identifier tail:(_ "," _ Identifier _ )* { return [head].concat(tail.map(child => child[3])) }
 
-Expression = FunctionCall / BooleanExpression / ArithmeticExpression
+Expression = BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }
 
 FunctionCall = name:Identifier _ "(" _  functionArguments:FunctionArguments _ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments } }
@@ -42,8 +49,8 @@ FunctionArguments = head:Expression tail:(_ "," _ Expression _ )* { return [head
 ArithmeticExpression = AdditionExpression / ParenthesizedExpression
 AdditionExpression = head:MultiplicationExpression tail:(_ operator:("+"/"-") _ right:MultiplicationExpression)* { return parseOperationList(head, tail) }
 MultiplicationExpression = head:ExponentiationExpression tail:(_ operator:("*"/"/"/"%") _ right:ExponentiationExpression)* { return parseOperationList(head, tail) }
-ExponentiationExpression = head:NumericExpression tail:(_ operator:"^" _ right:NumericExpression)* { return parseOperationList(head, tail) }
-NumericExpression = Number / Identifier / ParenthesizedExpression / MinusExpression / FunctionCall
+ExponentiationExpression = head:NumericExpression tail:(_ operator:"^" _ right:NumericExpression)* { return parseRightAssociativeOperationList(head, tail) }
+NumericExpression = Number / FunctionCall / Identifier / ParenthesizedExpression / MinusExpression
 ParenthesizedExpression = "(" _ expression: ArithmeticExpression _ ")" { return expression }
 MinusExpression = "-" _ expression:NumericExpression { return { type: "unaryOperation", left: expression, operator: "-" } }
 
@@ -79,7 +86,9 @@ DigitSequence = digits:[0-9]+ { return digits.join("") }
 
 // BooleanConstant = "true" / "false" { return { type: "boolean", value: text === "true" } }
 
-Separator "separator" = [\n\r]+
+Separator "separator" = [\n\r] __
 
-_ "whitespace" = [ \t]* { return "" }
-__ "lwhitespace" = [ \t\n\r]* { return "" }
+Comment "comment" = "//" [^\n\r]*
+
+_ "whitespace" = ([ \t] / Comment)* { return "" }
+__ "lwhitespace" = ([ \t\n\r] / Comment)* { return "" }
