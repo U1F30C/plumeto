@@ -238,6 +238,13 @@ exports[`examples > patterns/grid.plm 1`] = `
 }
 `;
 
+exports[`examples > patterns/heptapod-logogram.plm 1`] = `
+{
+  "hash": "75dce22b84f2062264c4207e95572fe50a2f97d4",
+  "segments": 5253,
+}
+`;
+
 exports[`examples > patterns/honeycomb.plm 1`] = `
 {
   "hash": "6cddb40d3278445e877cb74ba05f580952cd8b89",

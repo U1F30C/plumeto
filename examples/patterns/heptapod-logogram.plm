@@ -1,0 +1,232 @@
+// Heptapod B logogram
+// An ink ring like the writing in Arrival:
+// one open brush stroke with frayed ends,
+// and splashes of ink along it.
+// Every run writes a new word.
+
+pi = 3.141592653589793
+R = 150
+
+// the turtle can't report its direction,
+// so keep track of it here
+heading = 0
+function face(a) {
+  rotate a - heading rad; heading = a
+}
+
+function line(x1, y1, x2, y2) {
+  place x1, y1
+  face(atan2(y2 - y1, x2 - x1))
+  forward sqrt((x2 - x1)^2 + (y2 - y1)^2)
+}
+
+// a filled ink dot: spokes from the middle
+function dot(x, y, r) {
+  spokes = max(4, floor(r * 7))
+  for k in 1..spokes {
+    a = k / spokes * 2 * pi
+    line(x, y, x + r*cos(a), y + r*sin(a))
+  }
+}
+
+// a splash of width w that curls by `bend`
+// each step and thins to a point. Like real
+// ink it branches into smaller splashes,
+// which branch again (n levels): a fractal.
+// `wiggle` sets how much it wanders.
+function spike(x, y, a, len, w, bend, n) {
+  for s in 1..12 {
+    b = a + bend + (random() - 0.5) * wiggle
+    x2 = x + len / 12 * cos(b)
+    y2 = y + len / 12 * sin(b)
+    w1 = w * (1 - (s - 1) / 12)
+    w2 = w * (1 - s / 12)
+    strands = 1 + floor(w1)
+    for k in 1..strands {
+      o = k / strands - 0.5
+      line(x - o*w1*sin(a), y + o*w1*cos(a),
+           x2 - o*w2*sin(b),
+           y2 + o*w2*cos(b))
+    }
+    x = x2; y = y2; a = b
+    // branch last: variables are global, so
+    // the branch overwrites the ones above
+    if n > 0 {
+      if random() < 0.2 {
+        turn = (0.4 + random() * 0.6)
+        if random() < 0.5 { turn = -turn }
+        rest = len * (1 - s / 12)
+        curl = (random() - 0.5) * 0.5
+        spike(x, y, a + turn, rest * 0.7,
+              w2 * 0.9, curl, n - 1)
+      }
+    }
+  }
+}
+
+// --- the ring, an open stroke
+// it runs over `span` radians from `start`
+start = random() * 2 * pi
+span = 2 * pi * (0.72 + random() * 0.13)
+p1 = random() * 2 * pi
+p2 = random() * 2 * pi
+
+// u goes along the stroke, from 0 to 1
+function angle(u) {
+  return start + u * span
+}
+
+// thin ends, heavier in places
+function weight(u) {
+  ends = min(1, u / 0.06, (1 - u) / 0.1)
+  heavy = 5*max(0, sin(4*pi*u + p2))^2
+  return (3 + heavy) * ends^0.6
+}
+
+// near the ends the bristles fan out
+function fan(u) {
+  late = max(0, (u - 0.85) / 0.15)^2
+  early = max(0, (0.06 - u) / 0.06)^2
+  return 5*late + 4*early
+}
+
+// somewhere the stroke splits in two
+splitAt = 0.15 + random() * 0.5
+splitLength = 0.1 + random() * 0.15
+function split(u) {
+  v = (u - splitAt) / splitLength
+  if v > 0 {
+    if v < 1 { return 4*sin(pi*v) }
+  }
+  return 0
+}
+
+// side goes from -1 (inner) to 1 (outer)
+function radius(u, side) {
+  r = R + 3*sin(6*pi*u + p1)
+  r = r + side * (weight(u) / 2 + fan(u))
+  if side > 0.2 { r = r + split(u) }
+  return r
+}
+
+// one bristle, from u1 to u2
+function bristle(side, u1, u2) {
+  steps = 150
+  for s in 1..steps {
+    a = u1 + (u2 - u1) * (s - 1) / steps
+    b = u1 + (u2 - u1) * s / steps
+    ra = radius(a, side)
+    rb = radius(b, side)
+    line(ra*cos(angle(a)), ra*sin(angle(a)),
+         rb*cos(angle(b)), rb*sin(angle(b)))
+  }
+}
+
+// bristles start and stop at different
+// places, so the ends fray
+bristles = 12
+for j in 1..bristles {
+  side = (j - 1) / (bristles - 1) * 2 - 1
+  from = random() * 0.04
+  bristle(side, from, 1 - random() * 0.08)
+}
+
+// --- splashes, on the stroke
+
+// a blob: nested jagged outlines of one
+// shape, stretched along the stroke
+function blob(x, y, len, width) {
+  q1 = random() * 2 * pi
+  q2 = random() * 2 * pi
+  layers = floor(width)
+  for l in 1..layers {
+    f = l / layers
+    for k in 1..40 {
+      t1 = (k - 1) / 40 * 2 * pi
+      t2 = k / 40 * 2 * pi
+      j1 = 1 + 0.3*sin(3*t1 + q1)
+      j1 = j1 + 0.15*sin(7*t1 + q2)
+      j2 = 1 + 0.3*sin(3*t2 + q1)
+      j2 = j2 + 0.15*sin(7*t2 + q2)
+      rim(x, y, len*f, width*f, t1, j1,
+          t2, j2)
+    }
+  }
+}
+
+// one piece of a blob outline, turned to
+// follow the stroke
+function rim(x, y, l, w, t1, j1, t2, j2) {
+  dx1 = l * j1 * cos(t1)
+  dy1 = w * j1 * sin(t1)
+  dx2 = l * j2 * cos(t2)
+  dy2 = w * j2 * sin(t2)
+  c = cos(along)
+  s = sin(along)
+  line(x + dx1*c - dy1*s, y + dx1*s + dy1*c,
+       x + dx2*c - dy2*s, y + dx2*s + dy2*c)
+}
+
+// a splash at u along the ring
+function splash(u, size) {
+  cx = radius(u, 0) * cos(angle(u))
+  cy = radius(u, 0) * sin(angle(u))
+  along = angle(u) + pi / 2
+
+  // a few overlapping blobs make one mass
+  blobLength = (20 + random() * 12) * size
+  blobs = 2 + floor(random() * 3)
+  for b in 1..blobs {
+    shift = (random() - 0.5) * blobLength
+    bx = cx + shift * cos(along)
+    by = cy + shift * sin(along)
+    width = (6 + random() * 6) * size
+    blob(bx, by, blobLength * 0.6, width)
+  }
+
+  // splashes flying out
+  spikes = floor((6 + random() * 8) * size)
+  for k in 1..spikes {
+    a = random() * 2 * pi
+    len = (15 + random()^3 * 45) * size
+    w = (3 + random() * 5) * size
+    wiggle = 0.3
+    curl = (random() - 0.5) * 0.4
+    spike(cx, cy, a, len, w, curl, 2)
+  }
+
+  // drips running down
+  drips = 1 + floor(random() * 5 * size)
+  for k in 1..drips {
+    x = cx + (random() - 0.5) * blobLength
+    len = (15 + random() * 45) * size
+    w = 2 + random() * 3
+    wiggle = 0.1
+    curl = (random() - 0.5) * 0.04
+    spike(x, cy, pi / 2, len, w, curl, 0)
+  }
+
+  // fine dots, mostly to one side
+  sprayAt = random() * 2 * pi
+  sprays = floor((15 + random()*25) * size)
+  for k in 1..sprays {
+    a = sprayAt + (random() - 0.5) * 2
+    d = (30 + random()^2 * 70) * size
+    r = 0.4 + random() * 1.4
+    dot(cx + d*cos(a), cy + d*sin(a), r)
+  }
+}
+
+// one big splash, sometimes one or two
+// smaller ones, spread along the stroke
+count = 1 + floor(random() * 3)
+first = floor(random() * count)
+for i in 1..count {
+  u = (i - 1 + 0.2 + random() * 0.6) / count
+  u = 0.1 + u * 0.8
+  if i - 1 == first {
+    splash(u, 1.4)
+  } else {
+    splash(u, 0.5 + random() * 0.3)
+  }
+}
