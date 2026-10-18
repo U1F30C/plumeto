@@ -5,7 +5,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { run, seededRandom } from "../helpers";
 
 const examplesDir = join(__dirname, "../../examples");
-const examples = readdirSync(examplesDir).filter((f) => f.endsWith(".plm"));
+// paths relative to examples/, e.g. "basics/spiral.plm"
+const examples = readdirSync(examplesDir, { recursive: true, encoding: "utf8" })
+  .filter((f) => f.endsWith(".plm"))
+  .map((f) => f.split("\\").join("/"))
+  .sort();
 
 // Fingerprints each example's drawing so any change to its output gets flagged.
 // If a change is intended, review the diff and update with `pnpm test -u`.

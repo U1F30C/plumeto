@@ -238,8 +238,12 @@
   left: 0;
   z-index: 10;
   min-width: 14rem;
-  max-height: min(24rem, 60vh);
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  max-height: min(28rem, 70dvh);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   margin: 0;
   padding: 0.3rem;
   list-style: none;
@@ -260,6 +264,29 @@
 
 .menuItem:hover {
   background: var(--active-line);
+}
+
+.menuGroup {
+  margin: 0 0 0.3rem;
+  padding: 0;
+  list-style: none;
+}
+
+.menuHeading {
+  padding: 0.45rem 0.6rem 0.2rem;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  border-top: 1.5px dashed var(--line);
+}
+
+.menuList > li:first-child .menuHeading {
+  border-top: none;
+}
+
+.compactPanel .menuItem {
+  padding: 0.5rem 0.6rem;
 }
 
 .error {

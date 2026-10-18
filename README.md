@@ -8,7 +8,7 @@ Formal launguage definition can be found at `src/language/grammar.pegjs`. In a n
 
 ### Examples
 
-See `examples/` folder.
+See the `examples/` folder, grouped into `basics/`, `patterns/`, `golden-ratio/` and `l-systems/`.
 |Script|Output|
 |-|-|
 |**weed(stochastic)**|![weed](screenshots/weed(stochastic).png)|
@@ -55,8 +55,8 @@ Tests live in `tests/`, mirroring `src/`. `tests/language/examples.test.ts` fing
 Render a `.plm` script to SVG from the command line:
 
 ```bash
-node cli/bin.js examples/spiral.plm            # outputs spiral.svg
-node cli/bin.js examples/spiral.plm -o out.svg
+node cli/bin.js examples/basics/spiral.plm            # outputs spiral.svg
+node cli/bin.js examples/basics/spiral.plm -o out.svg
 ```
 
 ## Roadmap

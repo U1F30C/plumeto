@@ -3,7 +3,7 @@ import { join } from "path";
 import { describe, expect, it } from "vitest";
 import { decodeScript, encodeScript } from "../src/share";
 
-const longExample = readFileSync(join(__dirname, "../examples/weed(expanded).plm"), "utf8");
+const longExample = readFileSync(join(__dirname, "../examples/l-systems/weed(expanded).plm"), "utf8");
 
 describe("sharing scripts in a link", () => {
   it.each([
