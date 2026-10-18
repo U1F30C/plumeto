@@ -1,0 +1,31 @@
+// Moore curve
+// axiom LFL+F+LFL
+// L -> -RF+LFL+FR-
+// R -> +LF-RFR-FL+
+angle = 90
+step = 24
+
+// + is turn(1), - is turn(-1)
+function turn(k) { rotate k*angle deg }
+function F() { forward step }
+
+function L(n) {
+  if n > 0 {
+    turn(-1); R(n-1); F(); turn(1)
+    L(n-1); F(); L(n-1)
+    turn(1); F(); R(n-1); turn(-1)
+  }
+}
+
+function R(n) {
+  if n > 0 {
+    turn(1); L(n-1); F(); turn(-1)
+    R(n-1); F(); R(n-1)
+    turn(-1); F(); L(n-1); turn(1)
+  }
+}
+
+iterations = 3
+L(iterations); F(); L(iterations)
+turn(1); F(); turn(1)
+L(iterations); F(); L(iterations)

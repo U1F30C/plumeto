@@ -1,0 +1,26 @@
+// Sierpinski arrowhead
+// rules from Paul Bourke's L-system notes:
+// paulbourke.net/fractals/lsys
+// axiom YF
+// X -> YF+XF+Y
+// Y -> XF-YF-X
+angle = 60
+step = 6
+
+// + is turn(1), - is turn(-1)
+function turn(k) { rotate k*angle deg }
+function F() { forward step }
+
+function X(n) {
+  if n > 0 {
+    Y(n-1); F(); turn(1); X(n-1); F(); turn(1); Y(n-1)
+  }
+}
+
+function Y(n) {
+  if n > 0 {
+    X(n-1); F(); turn(-1); Y(n-1); F(); turn(-1); X(n-1)
+  }
+}
+
+Y(6); F()

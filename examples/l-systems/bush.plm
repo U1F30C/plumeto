@@ -1,0 +1,25 @@
+// Bush
+// rules from Paul Bourke's L-system notes:
+// paulbourke.net/fractals/lsys
+// F -> FF+[+F-F-F]-[-F+F+F]
+angle = 22.5
+
+// + is turn(1), - is turn(-1), [ ] are breadcrumb push/pop
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 6 } else {
+    F(n-1); F(n-1); turn(1)
+    breadcrumb push
+    turn(1); F(n-1); turn(-1); F(n-1); turn(-1); F(n-1)
+    breadcrumb pop
+    turn(-1)
+    breadcrumb push
+    turn(-1); F(n-1); turn(1); F(n-1); turn(1); F(n-1)
+    breadcrumb pop
+  }
+}
+
+// grow upwards
+rotate -90 deg
+F(4)

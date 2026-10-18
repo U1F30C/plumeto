@@ -1,0 +1,70 @@
+// Penrose tiling (P3)
+// axiom [X]++[X]++[X]++[X]++[X]
+// W -> YF++ZF----XF[-YF----WF]++
+// X -> +YF--ZF[---WF--XF]+
+// Y -> -WF++XF[+++YF++ZF]-
+// Z -> --YF++++WF[+ZF++++XF]--XF
+// F -> (nothing: only the last generation draws)
+angle = 36
+
+// ++ is turn(2), ---- is turn(-4)
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 20 }
+}
+
+function W(n) {
+  if n > 0 {
+    Y(n-1); F(n-1)
+    turn(2); Z(n-1); F(n-1)
+    turn(-4); X(n-1); F(n-1)
+    breadcrumb push
+    turn(-1); Y(n-1); F(n-1)
+    turn(-4); W(n-1); F(n-1)
+    breadcrumb pop
+    turn(2)
+  }
+}
+
+function X(n) {
+  if n > 0 {
+    turn(1); Y(n-1); F(n-1)
+    turn(-2); Z(n-1); F(n-1)
+    breadcrumb push
+    turn(-3); W(n-1); F(n-1)
+    turn(-2); X(n-1); F(n-1)
+    breadcrumb pop
+    turn(1)
+  }
+}
+
+function Y(n) {
+  if n > 0 {
+    turn(-1); W(n-1); F(n-1)
+    turn(2); X(n-1); F(n-1)
+    breadcrumb push
+    turn(3); Y(n-1); F(n-1)
+    turn(2); Z(n-1); F(n-1)
+    breadcrumb pop
+    turn(-1)
+  }
+}
+
+function Z(n) {
+  if n > 0 {
+    turn(-2); Y(n-1); F(n-1)
+    turn(4); W(n-1); F(n-1)
+    breadcrumb push
+    turn(1); Z(n-1); F(n-1)
+    turn(4); X(n-1); F(n-1)
+    breadcrumb pop
+    turn(-2); X(n-1); F(n-1)
+  }
+}
+
+iterations = 5
+for i in 1..5 {
+  breadcrumb push; X(iterations); breadcrumb pop
+  turn(2)
+}

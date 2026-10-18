@@ -1,0 +1,28 @@
+// Sticks
+// rules from Paul Bourke's L-system notes:
+// paulbourke.net/fractals/lsys
+// axiom X
+// X -> F[+X]F[-X]+X
+// F -> FF
+angle = 20
+
+// + is turn(1), - is turn(-1), [ ] are breadcrumb push/pop
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 2 } else { F(n-1); F(n-1) }
+}
+
+function X(n) {
+  if n > 0 {
+    F(n-1)
+    breadcrumb push; turn(1); X(n-1); breadcrumb pop
+    F(n-1)
+    breadcrumb push; turn(-1); X(n-1); breadcrumb pop
+    turn(1); X(n-1)
+  }
+}
+
+// grow upwards
+rotate -90 deg
+X(7)

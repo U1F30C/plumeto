@@ -1,0 +1,17 @@
+// Koch curve, Cesàro variant (a Koch curve with an 80° angle)
+// F -> F+F--F+F
+angle = 80
+
+// + is turn(1), -- is turn(-2)
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 2.5 } else {
+    F(n-1); turn(1); F(n-1); turn(-2)
+    F(n-1); turn(1); F(n-1)
+  }
+}
+
+// start facing left
+rotate 180 deg
+F(6)

@@ -1,0 +1,23 @@
+// Quadratic Koch island
+// rules from Paul Bourke's L-system notes:
+// paulbourke.net/fractals/lsys
+// axiom F+F+F+F
+// F -> F-FF+FF+F+F-F-FF+F+F-F-FF-FF+F
+angle = 90
+
+// + is turn(1), - is turn(-1)
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 6 } else {
+    F(n-1); turn(-1); F(n-1); F(n-1)
+    turn(1); F(n-1); F(n-1)
+    turn(1); F(n-1); turn(1); F(n-1)
+    turn(-1); F(n-1); turn(-1); F(n-1); F(n-1)
+    turn(1); F(n-1); turn(1); F(n-1)
+    turn(-1); F(n-1); turn(-1); F(n-1); F(n-1)
+    turn(-1); F(n-1); F(n-1); turn(1); F(n-1)
+  }
+}
+
+for i in 1..4 { F(2); turn(1) }

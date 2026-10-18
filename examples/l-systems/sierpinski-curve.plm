@@ -1,0 +1,24 @@
+// Classic Sierpinski curve (rules by Chris Wallace)
+// rules from Paul Bourke's L-system notes:
+// paulbourke.net/fractals/lsys
+// axiom F--XF--F--XF
+// X -> XF+F+XF--F--XF+F+X
+angle = 45
+step = 8
+
+// + is turn(1), -- is turn(-2)
+function turn(k) { rotate k*angle deg }
+function F() { forward step }
+
+function X(n) {
+  if n > 0 {
+    X(n-1); F(); turn(1); F(); turn(1)
+    X(n-1); F(); turn(-2); F(); turn(-2)
+    X(n-1); F(); turn(1); F(); turn(1)
+    X(n-1)
+  }
+}
+
+iterations = 4
+F(); turn(-2); X(iterations); F(); turn(-2)
+F(); turn(-2); X(iterations); F()

@@ -77,6 +77,132 @@ exports[`examples > golden-ratio/golden-tentacle.plm 1`] = `
 }
 `;
 
+exports[`examples > l-systems/bush.plm 1`] = `
+{
+  "hash": "e18b36505ee77db65d0904a7f7294ba5b8e42a63",
+  "segments": 4096,
+}
+`;
+
+exports[`examples > l-systems/cesaro-curve.plm 1`] = `
+{
+  "hash": "9c037d45997f2e1a1d8af859f582eb9713070725",
+  "segments": 4096,
+}
+`;
+
+exports[`examples > l-systems/crystal.plm 1`] = `
+{
+  "hash": "5182c4b1854a468e9ecd71262a4873b018348a46",
+  "segments": 2500,
+}
+`;
+
+exports[`examples > l-systems/dragon-curve.plm 1`] = `
+{
+  "hash": "1d618799889e226ee6a973566fe2ef03e6e2bc79",
+  "segments": 1024,
+}
+`;
+
+exports[`examples > l-systems/gosper-curve.plm 1`] = `
+{
+  "hash": "e5b28003a0d84902f9353e5e248ce96618d11e85",
+  "segments": 2401,
+}
+`;
+
+exports[`examples > l-systems/hilbert-curve.plm 1`] = `
+{
+  "hash": "581174217b17a430ac5ef6ab2dca7dc426c698cf",
+  "segments": 1023,
+}
+`;
+
+exports[`examples > l-systems/island-curve.plm 1`] = `
+{
+  "hash": "4e1ca33bce098b0d946aec27ff2c6bb7fc0c3cbc",
+  "segments": 1296,
+}
+`;
+
+exports[`examples > l-systems/koch-snowflake.plm 1`] = `
+{
+  "hash": "e05e04ecce8b9d86583bce59ccd3e682b042ee74",
+  "segments": 768,
+}
+`;
+
+exports[`examples > l-systems/levy-curve.plm 1`] = `
+{
+  "hash": "4e9b299bedd56181ef4c6006d874c1a164d35852",
+  "segments": 1024,
+}
+`;
+
+exports[`examples > l-systems/moore-curve.plm 1`] = `
+{
+  "hash": "c32d5cc0609a2f9ba11d5b8a982bf1d0008087f9",
+  "segments": 255,
+}
+`;
+
+exports[`examples > l-systems/peano-curve.plm 1`] = `
+{
+  "hash": "851ae1d680d0dc46c3b602413d73fbdbe272bfbc",
+  "segments": 728,
+}
+`;
+
+exports[`examples > l-systems/penrose-tiling.plm 1`] = `
+{
+  "hash": "190f3493bd4d554103ae45e136b97b92449c5614",
+  "segments": 7920,
+}
+`;
+
+exports[`examples > l-systems/pentadendrite.plm 1`] = `
+{
+  "hash": "d9e60b17c9fc1a7c527b47bcb9cd3ed45d9822ff",
+  "segments": 6480,
+}
+`;
+
+exports[`examples > l-systems/pentaplexity.plm 1`] = `
+{
+  "hash": "c659cca0d12ad51272b100d26c6775896f20a759",
+  "segments": 6480,
+}
+`;
+
+exports[`examples > l-systems/quadratic-koch-island.plm 1`] = `
+{
+  "hash": "02245a95c14b784c94edebb3edaf4796ce6952a9",
+  "segments": 1296,
+}
+`;
+
+exports[`examples > l-systems/sierpinski-arrowhead.plm 1`] = `
+{
+  "hash": "626594e82b8eeadf4b7623827a27d8a3ada7362c",
+  "segments": 729,
+}
+`;
+
+exports[`examples > l-systems/sierpinski-curve.plm 1`] = `
+{
+  "hash": "1dcddb46e1b933ba8dd1caa5c4296665e6a543c4",
+  "segments": 1024,
+}
+`;
+
+exports[`examples > l-systems/sticks.plm 1`] = `
+{
+  "hash": "86c460068145370ab641a78a8803e824d1a7d83c",
+  "segments": 4118,
+}
+`;
+
 exports[`examples > l-systems/weed(expanded).plm 1`] = `
 {
   "hash": "fca45a850fab3c666b86d95443e9d37bdf23d164",

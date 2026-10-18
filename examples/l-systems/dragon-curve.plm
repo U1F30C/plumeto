@@ -1,0 +1,24 @@
+// Dragon curve
+// axiom FX
+// X -> X+YF+
+// Y -> -FX-Y
+angle = 90
+step = 8
+
+// + is turn(1), - is turn(-1)
+function turn(k) { rotate k*angle deg }
+function F() { forward step }
+
+function X(n) {
+  if n > 0 {
+    X(n-1); turn(1); Y(n-1); F(); turn(1)
+  }
+}
+
+function Y(n) {
+  if n > 0 {
+    turn(-1); F(); X(n-1); turn(-1); Y(n-1)
+  }
+}
+
+F(); X(10)

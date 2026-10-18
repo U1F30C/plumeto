@@ -1,0 +1,16 @@
+// Lévy C curve
+// rules from Paul Bourke's L-system notes:
+// paulbourke.net/fractals/lsys
+// F -> -F++F-
+angle = 45
+
+// + is turn(1), ++ is turn(2)
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 8 } else {
+    turn(-1); F(n-1); turn(2); F(n-1); turn(-1)
+  }
+}
+
+F(10)

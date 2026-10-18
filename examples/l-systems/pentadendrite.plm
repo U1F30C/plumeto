@@ -1,0 +1,17 @@
+// McWorter's pentadendrite
+// axiom F-F-F-F-F
+// F -> F-F-F++F+F-F
+angle = 72
+
+// + is turn(1), ++ is turn(2)
+function turn(k) { rotate k*angle deg }
+
+function F(n) {
+  if n == 0 { forward 4 } else {
+    F(n-1); turn(-1); F(n-1); turn(-1); F(n-1)
+    turn(2); F(n-1); turn(1); F(n-1)
+    turn(-1); F(n-1)
+  }
+}
+
+for i in 1..5 { F(4); turn(-1) }

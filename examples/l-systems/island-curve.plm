@@ -1,0 +1,37 @@
+// Island curve (b moves without drawing)
+// axiom F-F-F-F
+// F -> F-b+FF-F-FF-Fb-FF+b-FF+F+FF+Fb+FFF
+// b -> bbbbbb
+angle = 90
+step = 6
+
+// + is turn(1), - is turn(-1)
+function turn(k) { rotate k*angle deg }
+
+function b(n) {
+  if n == 0 {
+    cursor off; forward step; cursor on
+  } else {
+    for i in 1..6 { b(n-1) }
+  }
+}
+
+function F(n) {
+  if n == 0 { forward step } else {
+    F(n-1)
+    turn(-1); b(n-1)
+    turn(1); F(n-1); F(n-1)
+    turn(-1); F(n-1)
+    turn(-1); F(n-1); F(n-1)
+    turn(-1); F(n-1); b(n-1)
+    turn(-1); F(n-1); F(n-1)
+    turn(1); b(n-1)
+    turn(-1); F(n-1); F(n-1)
+    turn(1); F(n-1)
+    turn(1); F(n-1); F(n-1)
+    turn(1); F(n-1); b(n-1)
+    turn(1); F(n-1); F(n-1); F(n-1)
+  }
+}
+
+for i in 1..4 { F(2); turn(-1) }
