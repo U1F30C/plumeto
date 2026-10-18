@@ -11,7 +11,7 @@ Formal launguage definition can be found at `src/language/grammar.pegjs`. In a n
 See `examples/` folder.
 |Script|Output|
 |-|-|
-|**weed(stochastic,2rounds)**|![weed](screenshots/weed(stochastic,2rounds).png)|
+|**weed(stochastic)**|![weed](screenshots/weed(stochastic).png)|
 |**spiral**|![spiral](screenshots/spiral.png)|
 |**hexpiral**|![hexpiral](screenshots/hexpiral.png)|
 |**penta-doodle**|![penta-doodle](screenshots/penta-doodle.png)|
@@ -63,12 +63,8 @@ node cli/bin.js examples/spiral.plm -o out.svg
 - Language
   - Data structures (lists), mainly to make L-systems easier to write
   - Local variables: assignments inside a function are global today (by design), consider a way to keep them local
-  - Line numbers in runtime errors (e.g. unknown identifier or function)
   - Allow continuing an expression on the next line after an operator
+  - Colors, e.g. a `color red` command (needs the interpreter, canvas and CLI to carry a color per line)
   - Other cool stuff
 - UX
-  - Show parse and runtime errors in the editor, pointing at the line
-  - Fix styles
-  - Fix dark mode
-  - Panning
-  - Colors
+  - Let Stop interrupt a script that is still computing (e.g. an endless loop, which currently freezes the tab), by running the interpreter in a Web Worker
