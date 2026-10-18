@@ -4,12 +4,21 @@ import { execute } from "@/language/execute";
 import { PlumetoError } from "@/language/errors";
 import styles from "@/styles/Home.module.css";
 import CodeMirror, { EditorView } from '@uiw/react-codemirror';
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { javascript } from '@codemirror/lang-javascript';
 import { Diagnostic, setDiagnostics } from '@codemirror/lint';
 import { examples } from "@/examples";
 
 const editorExtensions = [javascript({ jsx: true })]
+
+// lines drawn per animation frame
+const speeds = {
+  Slow: 1,
+  Normal: 5,
+  Fast: 50,
+  Instant: Infinity,
+};
+type Speed = keyof typeof speeds;
 
 export default function App() {
   const [script, setScript] = useState(`for x in 1..12 {
@@ -21,11 +30,39 @@ export default function App() {
   `);
 
   const [lines, setLines] = useState<LineSegment[]>([]);
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [speed, setSpeed] = useState<Speed>("Normal");
   const [error, setError] = useState<PlumetoError | null>(null);
   const editorRef = useRef<EditorView | null>(null);
+  const frameRef = useRef<number | null>(null);
+  // read inside the animation loop, so changing speed mid-drawing takes effect right away
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
+
+  function stopAnimation() {
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+  }
+
+  useEffect(() => stopAnimation, []);
+
+  function animate(total: number) {
+    stopAnimation();
+    let count = 0;
+    const step = () => {
+      count = Math.min(count + speeds[speedRef.current], total);
+      setVisibleCount(count);
+      frameRef.current = count < total ? requestAnimationFrame(step) : null;
+    };
+    frameRef.current = requestAnimationFrame(step);
+  }
 
   function reset() {
+    stopAnimation();
     setLines([]);
+    setVisibleCount(0);
   }
 
   function showError(error: PlumetoError | null) {
@@ -55,7 +92,7 @@ export default function App() {
     view.focus();
   }
 
-  async function runScript() {
+  function runScript() {
     const buffer: LineSegment[] = [];
     try {
       execute(script, (line) => {
@@ -66,10 +103,9 @@ export default function App() {
       // lines drawn before a runtime error are still shown, which helps to see how far it got
       showError(e instanceof PlumetoError ? e : new PlumetoError(String(e), "runtime"));
     }
-    for (const line of buffer) {
-      setLines((lines) => [...lines, line]);
-      await new Promise((resolve) => setTimeout(resolve, 10));
-    }
+    setLines(buffer);
+    setVisibleCount(0);
+    animate(buffer.length);
   }
 
   return (
@@ -86,7 +122,7 @@ export default function App() {
       </div>
 
       <div className={styles.center}>
-        <Draw lines={lines}/>
+        <Draw lines={lines} count={visibleCount} />
         <div>
           <button onClick={runScript} className={styles.button}>
             Run
@@ -94,6 +130,15 @@ export default function App() {
           <button onClick={reset} className={styles.button}>
             Reset
           </button>
+
+          <label>
+            Speed{" "}
+            <select value={speed} onChange={(e) => setSpeed(e.target.value as Speed)}>
+              {Object.keys(speeds).map((name) => (
+                <option key={name}>{name}</option>
+              ))}
+            </select>
+          </label>
 
           <select onChange={(e) => setScript(e.target.value)}>
             {examples.map((example) => (
