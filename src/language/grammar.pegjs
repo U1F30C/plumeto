@@ -25,7 +25,8 @@
 Program = ProgramRoot
 ProgramRoot = __ body:Statements? __ { return { type: "program", body: body ?? [] } }
 
-Statements = head:Statement _ tail:(Separator _ Statement _ )* {
+// a trailing ";" is allowed after the last statement
+Statements = head:Statement _ tail:(Separator _ Statement _ )* (";" _)? {
     return [head].concat(tail.map(child => child[2]))
 }
 
@@ -92,7 +93,7 @@ DigitSequence = [0-9]+
 
 // BooleanConstant = "true" / "false" { return { type: "boolean", value: text === "true" } }
 
-Separator "separator" = [\n\r] __
+Separator "separator" = (";" / [\n\r]) __
 
 Comment "comment" = "//" [^\n\r]*
 
