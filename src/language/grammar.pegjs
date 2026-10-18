@@ -29,7 +29,8 @@ Statements = head:Statement _ tail:(Separator _ Statement _ )* {
     return [head].concat(tail.map(child => child[2]))
 }
 
-Statement = Assignment / WhileBlock / ForBlock / Command / IfBlock / FunctionDefinition / ReturnStatement / Expression
+// statements carry their location so runtime errors can point at them
+Statement = statement:(Assignment / WhileBlock / ForBlock / Command / IfBlock / FunctionDefinition / ReturnStatement / Expression) { return { ...statement, location: location() } }
 ReturnStatement = "return" KeywordEnd _ expression:Expression { return { type: "return", expression } }
 
 Assignment = left:Identifier _ "=" _ right:Expression { return { type: "assignment", left, right } }
@@ -45,7 +46,7 @@ Block = "{" __ body:Statements? __ "}" { return body ?? [] }
 Expression = BooleanExpression / ArithmeticExpression
 RangeExpression = start:ArithmeticExpression _ ".." _ end:ArithmeticExpression { return [start, end] }
 
-FunctionCall = name:Identifier _ "(" __ functionArguments:FunctionArguments? __ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments ?? [] } }
+FunctionCall = name:Identifier _ "(" __ functionArguments:FunctionArguments? __ ")" { return { type: "functionCall", name: name.name, arguments: functionArguments ?? [], location: location() } }
 FunctionArguments = head:Expression tail:(__ "," __ Expression)* { return [head].concat(tail.map(child => child[3])) }
 
 ArithmeticExpression = AdditionExpression / ParenthesizedExpression
@@ -79,7 +80,7 @@ BreadcrumbCommand = "breadcrumb" KeywordEnd _ action:("push" / "pop") KeywordEnd
 
 
 
-Identifier = name:$([A-Za-z_] IdentifierChar*) { return { type: "identifier", name } }
+Identifier = name:$([A-Za-z_] IdentifierChar*) { return { type: "identifier", name, location: location() } }
 IdentifierChar = [A-Za-z0-9_]
 // keywords must not run into a name, so forward_line(3) is a call rather than "forward _line(3)"
 KeywordEnd = !IdentifierChar

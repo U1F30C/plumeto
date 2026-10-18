@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve, basename, extname } from 'path'
-import { ProgramRunner, LineSegment } from '../src/language/program_runner.js'
-import { parser } from '../src/language/parser.js'
-import { Program } from '../src/language/program.js'
+import { LineSegment } from '../src/language/program_runner.js'
+import { execute } from '../src/language/execute.js'
+import { PlumetoError } from '../src/language/errors.js'
 
 const SIZE = 500
 const CENTER = SIZE / 2
@@ -56,20 +56,17 @@ try {
   process.exit(1)
 }
 
-let program: Program
-try {
-  program = parser.parse(source) as Program
-} catch (e) {
-  console.error('Parse error:', (e as Error).message)
-  process.exit(1)
-}
-
 const lines: LineSegment[] = []
-const runner = new ProgramRunner()
 try {
-  runner.run(program, (line) => lines.push(line))
+  execute(source, (line) => lines.push(line))
 } catch (e) {
-  console.error('Runtime error:', (e as Error).message)
+  if (e instanceof PlumetoError) {
+    const kind = e.kind === 'syntax' ? 'Syntax error' : 'Runtime error'
+    const where = e.location ? ` at ${input}:${e.location.start.line}:${e.location.start.column}` : ''
+    console.error(`${kind}${where}: ${e.message}`)
+  } else {
+    console.error('Error:', (e as Error).message)
+  }
   process.exit(1)
 }
 

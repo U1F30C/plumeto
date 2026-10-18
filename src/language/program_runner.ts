@@ -20,6 +20,7 @@ import {
   WhileStatement,
   supportedNativeMathFunctions,
 } from "./program";
+import { PlumetoError, SourceLocation } from "./errors";
 
 export type LineSegment = [number, number, number, number];
 
@@ -40,6 +41,8 @@ interface ExecutionContext {
 export class ProgramRunner {
   ctx: ExecutionContext;
   addLine: (line: LineSegment) => void = () => {};
+  // how many function calls deep we are, a return is only valid above 0
+  callDepth = 0;
   constructor() {
     this.ctx = this.newContext();
   }
@@ -68,10 +71,9 @@ export class ProgramRunner {
 
   run(program: Program, addLine: (line: LineSegment) => void) {
     this.ctx = this.newContext();
+    this.callDepth = 0;
     this.addLine = addLine;
-    if (this.executeStatements(program.body)) {
-      throw new Error("return used outside of a function");
-    }
+    this.executeStatements(program.body);
   }
 
   // a Completion is set when a return statement ran, and carries its value up
@@ -86,6 +88,14 @@ export class ProgramRunner {
   }
 
   executeStatement(statement: Statement): Completion {
+    try {
+      return this.runStatement(statement);
+    } catch (error) {
+      throw locateError(error, statement.location);
+    }
+  }
+
+  private runStatement(statement: Statement): Completion {
     switch (statement.type) {
       case "assignment":
         this.executeAssignmentStatement(statement);
@@ -97,6 +107,9 @@ export class ProgramRunner {
       case "if":
         return this.executeIfStatement(statement);
       case "return":
+        if (this.callDepth === 0) {
+          throw new PlumetoError("return used outside of a function", "runtime");
+        }
         return { value: this.resolveExpression(statement.expression) };
       case "command":
         this.executeCommandStatement(statement);
@@ -179,6 +192,12 @@ export class ProgramRunner {
         this.ctx.cursor.angle,
       ]);
     } else if (statement.action === "pop") {
+      if (this.ctx.locationStack.length === 0) {
+        throw new PlumetoError(
+          "breadcrumb pop without a matching breadcrumb push",
+          "runtime"
+        );
+      }
       const [x, y, angle] = this.ctx.locationStack.pop()!;
       this.ctx.cursor.x = x;
       this.ctx.cursor.y = y;
@@ -241,7 +260,11 @@ export class ProgramRunner {
     } else if (expression.type === "identifier") {
       const value = this.ctx.symbols[expression.name];
       if (value === undefined) {
-        throw new Error("Unknown identifier: " + expression.name);
+        throw new PlumetoError(
+          "Unknown identifier: " + expression.name,
+          "runtime",
+          expression.location
+        );
       }
       return value;
     } else if (expression.type === "operation") {
@@ -268,7 +291,11 @@ export class ProgramRunner {
     if (!definition && expression.name in Math) {
       return this.resolveNativeFunctionCall(expression);
     } else if (!definition) {
-      throw new Error("Unknown function: " + expression.name);
+      throw new PlumetoError(
+        "Unknown function: " + expression.name,
+        "runtime",
+        expression.location
+      );
     }
     const args = expression.arguments.map((arg) => this.resolveExpression(arg));
     const newCtx = this.cloneContext();
@@ -277,7 +304,9 @@ export class ProgramRunner {
     }
     const oldCtx = this.ctx;
     this.ctx = newCtx;
+    this.callDepth++;
     const returnValue = this.executeStatements(definition.body)?.value;
+    this.callDepth--;
     for (const parameter of definition.parameters) {
       delete newCtx.symbols[parameter.name];
     }
@@ -350,4 +379,14 @@ export class ProgramRunner {
     }
     throw new Error("Unknown operator");
   }
+}
+
+// keeps the most specific location: the innermost statement or expression that knows where it is
+function locateError(error: unknown, location?: SourceLocation): PlumetoError {
+  if (error instanceof PlumetoError) {
+    error.location ??= location;
+    return error;
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  return new PlumetoError(message, "runtime", location);
 }

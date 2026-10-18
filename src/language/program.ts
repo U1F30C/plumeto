@@ -1,3 +1,5 @@
+import { SourceLocation } from "./errors";
+
 export interface Program {
   type: "program";
   body: Statement[];
@@ -36,7 +38,7 @@ export interface FunctionDefinitionStatement {
   body: Statement[];
 }
 
-export type Statement =
+export type Statement = (
   | AssignmentStatement
   | WhileStatement
   | ForStatement
@@ -44,7 +46,8 @@ export type Statement =
   | IfStatement
   | FunctionDefinitionStatement
   | ReturnStatement
-  | Expression;
+  | Expression
+) & { location?: SourceLocation };
 
 export interface ReturnStatement {
   type: "return";
@@ -104,7 +107,11 @@ export type Expression =
   | BooleanConstant
   | FunctionCall;
 
-export type Identifier = { type: "identifier"; name: string };
+export type Identifier = {
+  type: "identifier";
+  name: string;
+  location?: SourceLocation;
+};
 export interface BooleanConstant {
   type: "boolean";
   value: boolean;
@@ -114,6 +121,7 @@ export interface FunctionCall {
   type: "functionCall";
   name: string;
   arguments: Expression[];
+  location?: SourceLocation;
 }
 // only functinos already present in Math object
 export const supportedNativeMathFunctions = [

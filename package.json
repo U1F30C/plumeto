@@ -2,6 +2,7 @@
   "name": "plumeto",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "grammar": "peggy --format es -o src/language/_parser.js src/language/grammar.pegjs",
@@ -11,6 +12,7 @@
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/lint": "^6.9.7",
     "@types/numjs": "^0.16.7",
     "@uiw/react-codemirror": "^4.21.21",
     "numjs": "^0.16.1",

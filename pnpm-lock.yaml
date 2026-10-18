@@ -11,6 +11,9 @@ importers:
       '@codemirror/lang-javascript':
         specifier: ^6.2.1
         version: 6.2.5
+      '@codemirror/lint':
+        specifier: ^6.9.7
+        version: 6.9.7
       '@types/numjs':
         specifier: ^0.16.7
         version: 0.16.8

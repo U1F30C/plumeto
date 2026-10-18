@@ -1,11 +1,12 @@
 import { Draw } from "@/components/Draw";
-import { LineSegment, ProgramRunner } from "@/language/program_runner";
-import { parser } from "@/language/parser";
-import { Program } from "@/language/program";
+import { LineSegment } from "@/language/program_runner";
+import { execute } from "@/language/execute";
+import { PlumetoError } from "@/language/errors";
 import styles from "@/styles/Home.module.css";
-import CodeMirror from '@uiw/react-codemirror';
-import { useState } from "react";
+import CodeMirror, { EditorView } from '@uiw/react-codemirror';
+import { useRef, useState } from "react";
 import { javascript } from '@codemirror/lang-javascript';
+import { Diagnostic, setDiagnostics } from '@codemirror/lint';
 import { examples } from "@/examples";
 
 const editorExtensions = [javascript({ jsx: true })]
@@ -20,26 +21,54 @@ export default function App() {
   `);
 
   const [lines, setLines] = useState<LineSegment[]>([]);
+  const [error, setError] = useState<PlumetoError | null>(null);
+  const editorRef = useRef<EditorView | null>(null);
 
   function reset() {
     setLines([]);
   }
 
+  function showError(error: PlumetoError | null) {
+    setError(error);
+    const view = editorRef.current;
+    if (!view) return;
+    const diagnostics: Diagnostic[] = [];
+    if (error?.location) {
+      const length = view.state.doc.length;
+      diagnostics.push({
+        from: Math.min(error.location.start.offset, length),
+        to: Math.min(error.location.end.offset, length),
+        severity: "error",
+        message: error.message,
+      });
+    }
+    view.dispatch(setDiagnostics(view.state, diagnostics));
+  }
+
+  function goToError() {
+    const view = editorRef.current;
+    if (!view || !error?.location) return;
+    view.dispatch({
+      selection: { anchor: Math.min(error.location.start.offset, view.state.doc.length) },
+      scrollIntoView: true,
+    });
+    view.focus();
+  }
+
   async function runScript() {
-    console.log(script);
+    const buffer: LineSegment[] = [];
     try {
-      const program = parser.parse(script) as Program;
-      const runner = new ProgramRunner();
-      const buffer: LineSegment[] = [];
-      runner.run(program, (line) => {
+      execute(script, (line) => {
         buffer.push(line);
       });
-      for (const line of buffer) {
-        setLines((lines) => [...lines, line]);
-        await new Promise((resolve) => setTimeout(resolve, 10));
-      }
+      showError(null);
     } catch (e) {
-      console.error('Error running script:', e);
+      // lines drawn before a runtime error are still shown, which helps to see how far it got
+      showError(e instanceof PlumetoError ? e : new PlumetoError(String(e), "runtime"));
+    }
+    for (const line of buffer) {
+      setLines((lines) => [...lines, line]);
+      await new Promise((resolve) => setTimeout(resolve, 10));
     }
   }
 
@@ -78,7 +107,17 @@ export default function App() {
             value={script}
             onChange={setScript}
             extensions={editorExtensions}
+            onCreateEditor={(view) => {
+              editorRef.current = view;
+            }}
           />
+          {error && (
+            <p className={styles.error} role="alert" onClick={goToError}>
+              <strong>{error.kind === "syntax" ? "Syntax error" : "Runtime error"}</strong>
+              {error.location && ` on line ${error.location.start.line}, column ${error.location.start.column}`}
+              : {error.message}
+            </p>
+          )}
         </div>
       </div>
     </main>
