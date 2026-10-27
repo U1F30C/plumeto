@@ -72,6 +72,7 @@ Command = ForwardCommand
     / PlaceAtCommand
     / CursorCommand
     / BreadcrumbCommand
+    / ColorCommand
 
 ForwardCommand = "forward" KeywordEnd _ distance:ArithmeticExpression { return { type: "command", command: "forward", distance } }
 RotateCommand = "rotate" KeywordEnd _ angle:ArithmeticExpression _ unit:("deg" / "rad") KeywordEnd { return { type: "command", command: "rotate", angle, unit } }
@@ -79,7 +80,9 @@ PlaceAtCommand = "place" KeywordEnd _ x:ArithmeticExpression _ "," _ y:Arithmeti
 CursorCommand = "cursor" KeywordEnd _ state:("on" / "off") KeywordEnd { return { type: "command", command: "cursor", state } }
 BreadcrumbCommand = "breadcrumb" KeywordEnd _ action:("push" / "pop") KeywordEnd { return { type: "command", command: "breadcrumb", action } }
 
-
+// a CSS color name or a hex code; whether the name exists is checked when the command runs
+ColorCommand = "color" KeywordEnd _ color:ColorValue { return { type: "command", command: "color", color } }
+ColorValue = $("#" [0-9A-Fa-f]+ !IdentifierChar) / $([A-Za-z]+ !IdentifierChar)
 
 Identifier = name:$([A-Za-z_] IdentifierChar*) { return { type: "identifier", name, location: location() } }
 IdentifierChar = [A-Za-z0-9_]

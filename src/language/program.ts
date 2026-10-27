@@ -86,12 +86,20 @@ export interface BreadcrumbCommandStatement {
   action: "pop" | "push";
 }
 
+export interface ColorCommandStatement {
+  type: "command";
+  command: "color";
+  // a CSS color name, a hex code, or "default" for the drawing's normal ink
+  color: string;
+}
+
 export type CommandStatement =
   | ForwardCommandStatement
   | RotateCommandStatement
   | PlaceCommandStatement
   | CursorCommandStatement
-  | BreadcrumbCommandStatement;
+  | BreadcrumbCommandStatement
+  | ColorCommandStatement;
 
 export interface Operation {
   type: "operation" | "unaryOperation";

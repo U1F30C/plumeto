@@ -21,7 +21,7 @@ describe("examples", () => {
   it.each(examples)("%s", (file) => {
     vi.spyOn(Math, "random").mockImplementation(seededRandom(42));
     const { lines } = run(readFileSync(join(examplesDir, file), "utf8"));
-    const coords = lines.flat().map((n) => n.toFixed(3));
+    const coords = lines.flatMap(([x1, y1, x2, y2]) => [x1, y1, x2, y2]).map((n) => n.toFixed(3));
     expect({
       segments: lines.length,
       hash: createHash("sha1").update(coords.join(",")).digest("hex"),

@@ -22,8 +22,8 @@ function toSvg(lines: LineSegment[]): string {
   const w = maxX - minX
   const h = maxY - minY
 
-  const lineElements = lines.map(([x1, y1, x2, y2]) =>
-    `  <line x1="${x1 - minX}" y1="${y1 - minY}" x2="${x2 - minX}" y2="${y2 - minY}" stroke="${STROKE}" stroke-width="${STROKE_WIDTH}"/>`
+  const lineElements = lines.map(([x1, y1, x2, y2, color]) =>
+    `  <line x1="${x1 - minX}" y1="${y1 - minY}" x2="${x2 - minX}" y2="${y2 - minY}" stroke="${color ?? STROKE}" stroke-width="${STROKE_WIDTH}"/>`
   ).join('\n')
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">

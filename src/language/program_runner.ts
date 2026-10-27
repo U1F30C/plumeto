@@ -3,6 +3,7 @@ import {
   AssignmentStatement,
   BooleanExpression,
   BreadcrumbCommandStatement,
+  ColorCommandStatement,
   CommandStatement,
   CursorCommandStatement,
   Expression,
@@ -21,8 +22,10 @@ import {
   supportedNativeMathFunctions,
 } from "./program";
 import { PlumetoError, SourceLocation } from "./errors";
+import { isValidColor } from "./colors";
 
-export type LineSegment = [number, number, number, number];
+// x1, y1, x2, y2 and the color the line was drawn in; no color means the drawing's normal ink
+export type LineSegment = [number, number, number, number, string?];
 
 type Completion = { value: number | boolean } | undefined;
 
@@ -34,6 +37,7 @@ interface ExecutionContext {
     y: number;
     angle: number;
     cursorOn: boolean;
+    color?: string;
   };
   locationStack: [x: number, y: number, angle: number][];
 }
@@ -182,6 +186,9 @@ export class ProgramRunner {
       case "breadcrumb":
         this.executeBreadcrumbCommandStatement(statement);
         break;
+      case "color":
+        this.executeColorCommandStatement(statement);
+        break;
     }
   }
   executeBreadcrumbCommandStatement(statement: BreadcrumbCommandStatement) {
@@ -214,12 +221,14 @@ export class ProgramRunner {
       this.ctx.cursor.y + Math.sin(this.ctx.cursor.angle) * distance;
 
     if (this.ctx.cursor.cursorOn) {
-      this.addLine([
+      const line: LineSegment = [
         this.ctx.cursor.x,
         this.ctx.cursor.y,
         newCursorX,
         newCursorY,
-      ]);
+      ];
+      if (this.ctx.cursor.color) line.push(this.ctx.cursor.color);
+      this.addLine(line);
     }
     this.ctx.cursor.x = newCursorX;
     this.ctx.cursor.y = newCursorY;
@@ -235,6 +244,15 @@ export class ProgramRunner {
   executePlaceCommandStatement(statement: PlaceCommandStatement) {
     this.ctx.cursor.x = this.resolveArithmeticExpression(statement.x);
     this.ctx.cursor.y = this.resolveArithmeticExpression(statement.y);
+  }
+  executeColorCommandStatement(statement: ColorCommandStatement) {
+    if (statement.color === "default") {
+      this.ctx.cursor.color = undefined;
+    } else if (isValidColor(statement.color)) {
+      this.ctx.cursor.color = statement.color;
+    } else {
+      throw new PlumetoError(`Unknown color "${statement.color}"`, "runtime");
+    }
   }
   executeCursorCommandStatement(statement: CursorCommandStatement) {
     this.ctx.cursor.cursorOn = statement.state === "on";

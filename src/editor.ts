@@ -4,7 +4,7 @@ import { EditorView, keymap } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 
 const keywords = /^(for|in|while|if|else|function|return)\b/;
-const commands = /^(forward|rotate|place|cursor|breadcrumb)\b/;
+const commands = /^(forward|rotate|place|cursor|breadcrumb|color)\b/;
 const units = /^(deg|rad|on|off|push|pop)\b/;
 
 // highlighting only, the real grammar lives in src/language/grammar.pegjs

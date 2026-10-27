@@ -6,6 +6,10 @@ This is a drawing application for [turtle graphics](https://en.wikipedia.org/wik
 
 Formal launguage definition can be found at `src/language/grammar.pegjs`. In a nutshell, it is a simple procedural language with a somewhat C-like syntax.
 
+### Colors
+
+`color red` sets the color of the lines drawn from then on. It takes a CSS color name or a hex code (`color #8a2be2`), and `color default` goes back to the normal ink. Nothing but lines carries a color, so `breadcrumb pop` doesn't restore it.
+
 ### Examples
 
 See the `examples/` folder, grouped into `basics/`, `patterns/`, `golden-ratio/` and `l-systems/`.
@@ -70,7 +74,6 @@ node cli/bin.js examples/basics/spiral.plm -o out.svg
   - Allow line breaks inside command arguments, e.g. after the comma in `place x, y` (function calls already allow them)
   - A way to read the cursor's position and direction, so scripts don't have to track them in variables
   - A `pi` constant
-  - Colors, e.g. a `color red` command (needs the interpreter, canvas and CLI to carry a color per line)
   - Other cool stuff
 - UX
   - Let Stop interrupt a script that is still computing (e.g. an endless loop, which currently freezes the tab), by running the interpreter in a Web Worker

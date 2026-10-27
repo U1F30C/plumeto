@@ -100,12 +100,15 @@ export function Draw(props: DrawProps) {
 
     const ratio = size.pixelRatio;
     context.setTransform(ratio * view.scale, 0, 0, ratio * view.scale, ratio * view.x, ratio * view.y);
-    context.strokeStyle = getComputedStyle(canvas).getPropertyValue('--ink').trim();
+    const ink = getComputedStyle(canvas).getPropertyValue('--ink').trim();
     // keep a constant on-screen line width at any zoom
     context.lineWidth = 1.5 / view.scale;
     context.lineCap = 'round';
     context.lineJoin = 'round';
-    for (let i = 0; i < props.count; i++) context.stroke(cache.paths[i]);
+    for (let i = 0; i < props.count; i++) {
+      context.strokeStyle = props.lines[i][4] ?? ink;
+      context.stroke(cache.paths[i]);
+    }
   }, [props.lines, props.count, props.theme, size, view, generator]);
 
   // ---------- panning and zooming ----------
