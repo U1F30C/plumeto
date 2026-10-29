@@ -12,6 +12,31 @@ export const exampleGroups = [
   { folder: 'l-systems', label: 'L-systems' },
 ]
 
+// the filter chips of the example gallery: each one gathers one or more folders
+export const exampleCategories = [
+  { label: 'Basics', folders: ['basics'] },
+  { label: 'Geometric', folders: ['patterns'] },
+  { label: 'Strings & spirals', folders: ['whirls', 'string-art', 'spirographs'] },
+  { label: 'Flourishes', folders: ['flourishes'] },
+  { label: 'Fractals', folders: ['golden-ratio', 'l-systems'] },
+]
+
+// shown first in the gallery and under their own chip, in this order
+export const featuredExamples = [
+  'scroll-flourish.plm',
+  'chord-mandala.plm',
+  'spirograph-flowers.plm',
+  'spirograph-rosettes.plm',
+  'weed(stochastic).plm',
+  'golden-flower.plm',
+  'penrose-tiling.plm',
+  'heptapod-logogram.plm',
+  'sierpinski-arrowhead.plm',
+]
+
+// listed ahead of the rest of their folder
+const firstInFolder = ['weed.plm', 'weed(stochastic).plm', 'weed(expanded).plm']
+
 export interface ExampleFile {
   fileName: string;
   fileContents: string;
@@ -24,7 +49,16 @@ const groupOrder = (example: ExampleFile) => {
   return index === -1 ? exampleGroups.length : index
 }
 
-// grouped in section order; within a group, files keep the glob's alphabetical order
+// a file's name without its extension and with spaces, as the gallery shows it
+export const exampleTitle = (example: ExampleFile) => example.fileName.replace(/\.plm$/, '').replace(/-/g, ' ')
+
+const folderOrder = (example: ExampleFile) => {
+  const index = firstInFolder.indexOf(example.fileName)
+  return index === -1 ? firstInFolder.length : index
+}
+
+// grouped in section order; within a group, files keep the glob's alphabetical order,
+// except the ones listed in firstInFolder
 export const examples: ExampleFile[] = Object.entries(modules)
   .map(([path, content]) => {
     const parts = path.split('/')
@@ -34,4 +68,4 @@ export const examples: ExampleFile[] = Object.entries(modules)
       group: parts.pop()!,
     }
   })
-  .sort((a, b) => groupOrder(a) - groupOrder(b))
+  .sort((a, b) => groupOrder(a) - groupOrder(b) || folderOrder(a) - folderOrder(b))

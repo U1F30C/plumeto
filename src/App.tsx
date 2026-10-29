@@ -293,6 +293,7 @@ export default function App() {
               examples={examples}
               currentName={loadedExample.fileName}
               modified={modified}
+              theme={theme}
               onSelect={loadExample}
             />
             {!compact && (
