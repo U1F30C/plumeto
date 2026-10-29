@@ -12,7 +12,7 @@ Formal launguage definition can be found at `src/language/grammar.pegjs`. In a n
 
 ### Examples
 
-See the `examples/` folder, grouped into `basics/`, `patterns/`, `golden-ratio/` and `l-systems/`.
+See the `examples/` folder, grouped into `basics/`, `patterns/`, `whirls/`, `string-art/`, `spirographs/`, `flourishes/`, `golden-ratio/` and `l-systems/`.
 |Script|Output|
 |-|-|
 |**heptapod-logogram**|![heptapod-logogram](screenshots/heptapod-logogram.png)|

@@ -1,0 +1,25 @@
+// string art with an off-center hole: from each point of a big circle one straight line is
+// drawn that just touches a smaller circle placed to one side
+pi = acos(-1)
+n = 144
+radius = 220
+inner = 70
+shift = 90
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+for i in 0..n - 1 {
+  a = 2 * pi * i / n
+  px = radius * cos(a)
+  py = radius * sin(a)
+  // the direction towards the small circle's middle, turned until the line grazes it
+  toward = atan2(0 - py, shift - px)
+  heading = toward + asin(inner / hypot(shift - px, 0 - py))
+  line(px, py, px + cos(heading) * -2 * (px * cos(heading) + py * sin(heading)), py + sin(heading) * -2 * (px * cos(heading) + py * sin(heading)))
+}

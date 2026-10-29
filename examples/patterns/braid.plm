@@ -1,0 +1,26 @@
+// a rope of three strands, each swinging from side to side and crossing the others
+pi = acos(-1)
+length = 320
+wave = 40
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+function strand(phase) {
+  for y in 0..length - 1 {
+    t0 = y / 22 + phase
+    t1 = (y + 1) / 22 + phase
+    // every strand is two lines side by side, so it reads as a ribbon
+    line(wave * sin(t0) - 4, y, wave * sin(t1) - 4, y + 1)
+    line(wave * sin(t0) + 4, y, wave * sin(t1) + 4, y + 1)
+  }
+}
+
+strand(0)
+strand(2 * pi / 3)
+strand(4 * pi / 3)

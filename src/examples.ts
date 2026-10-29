@@ -4,6 +4,10 @@ const modules = import.meta.glob('../examples/**/*.plm', { query: '?raw', import
 export const exampleGroups = [
   { folder: 'basics', label: 'Basics' },
   { folder: 'patterns', label: 'Patterns' },
+  { folder: 'whirls', label: 'Whirls' },
+  { folder: 'string-art', label: 'String art' },
+  { folder: 'spirographs', label: 'Spirographs' },
+  { folder: 'flourishes', label: 'Flourishes' },
   { folder: 'golden-ratio', label: 'Golden ratio' },
   { folder: 'l-systems', label: 'L-systems' },
 ]

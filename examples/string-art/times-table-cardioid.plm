@@ -1,0 +1,20 @@
+// the times table on a circle: point i is joined to point i * factor, and 2 draws a cardioid
+// (try 3 for a nephroid, or more for flowers with more petals)
+pi = acos(-1)
+n = 144
+factor = 2
+radius = 200
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+for i in 0..n - 1 {
+  a = 2 * pi * i / n
+  b = 2 * pi * (i * factor) / n
+  line(radius * cos(a), radius * sin(a), radius * cos(b), radius * sin(b))
+}

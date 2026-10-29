@@ -1,0 +1,215 @@
+// a scroll flourish: a long S sweeps in from the left, dips into a trough and rises into a
+// ring on the right that winds into a spiral; out of the trough a great circle climbs and
+// comes back over the top, ending in a pointed leaf, with a second spiral, a comma leaf, a
+// curl and a few more leaves tucked in and around it.
+//
+// Every stroke is a chain of Euler spiral pieces: the turn per step glides from one value to
+// the next and each piece starts on the turn the last one ended on, so the curvature never
+// jumps. The values were fitted by measuring the reference drawing and simulating the turtle,
+// so a long stroke can be one arc, an inflection and a spiral all at once. Strokes that grow
+// out of another start exactly on it and head along it (or straight back up it), so they peel
+// away tangentially.
+//
+// The leaves are outlines around a curved spine of two Euler pieces: the half width at a
+// fraction s along the leaf is s^a * (1 - s)^b, thin where the leaf leaves its stem, and
+// either pointed or rounded at the tip depending on b.
+
+pi = acos(-1)
+
+// the pen's position and heading, kept by hand so a stroke can start anywhere
+hx = 0
+hy = 0
+hh = 0
+
+function go(x, y, h) {
+  cursor off
+  place x, y
+  rotate (h - hh) deg
+  hh = h
+  hx = x
+  hy = y
+  cursor on
+}
+
+// a curve of 4-pixel steps whose turn per step glides from k0 to k1 degrees
+function curve(steps, k0, k1) {
+  for i in 1..steps {
+    forward 4
+    hx = hx + 4 * cos(hh * pi / 180)
+    hy = hy + 4 * sin(hh * pi / 180)
+    t = k0 + (k1 - k0) * i / steps
+    rotate t deg
+    hh = hh + t
+  }
+}
+
+// a straight line to (x, y)
+function lineto(x, y) {
+  d = atan2(y - hy, x - hx) * 180 / pi
+  rotate (d - hh) deg
+  forward hypot(x - hx, y - hy)
+  hh = d
+  hx = x
+  hy = y
+}
+
+// the turn after step j of a spine made of two Euler pieces, k0 to k1 then k1 to k2
+function spineturn(j, n1, n2, k0, k1, k2) {
+  if j <= n1 {
+    return k0 + (k1 - k0) * j / n1
+  }
+  return k1 + (k2 - k1) * (j - n1) / n2
+}
+
+// the half width at a fraction s of a leaf, scaled so the widest point is w
+function halfwidth(s, w, a, b) {
+  return w * pow(s, a) * pow(1 - s, b) / (pow(a / (a + b), a) * pow(b / (a + b), b))
+}
+
+// a leaf outline around a curved spine that leaves the pen's position: up one side to the
+// tip and back down the other, so it closes where it started. The spine is walked in
+// 4-pixel steps, except the last step, which is cut finer so a blunt tip comes out round.
+function leaf(n1, n2, k0, k1, k2, w, a, b) {
+  n = n1 + n2
+  sx = hx
+  sy = hy
+  sh = hh
+  for j in 1..n - 1 {
+    sx = sx + 4 * cos(sh * pi / 180)
+    sy = sy + 4 * sin(sh * pi / 180)
+    tj = spineturn(j, n1, n2, k0, k1, k2)
+    nh = (sh + tj / 2) * pi / 180
+    sh = sh + tj
+    r = halfwidth(j / n, w, a, b)
+    lineto(sx - r * sin(nh), sy + r * cos(nh))
+  }
+  // round the tip: the last step, sampled finely along one side and back along the other
+  for q in -8..8 {
+    f = 1 - abs(q) / 9
+    if q == 0 {
+      f = 1
+    }
+    c = 1
+    if q > 0 {
+      c = -1
+    }
+    r = halfwidth((n - 1 + f) / n, w, a, b)
+    lineto(sx + 4 * f * cos(sh * pi / 180) - c * r * sin(sh * pi / 180), sy + 4 * f * sin(sh * pi / 180) + c * r * cos(sh * pi / 180))
+  }
+  r = halfwidth((n - 1) / n, w, a, b)
+  lineto(sx + r * sin(sh * pi / 180), sy - r * cos(sh * pi / 180))
+  for jj in 2..n {
+    j = n - jj + 1
+    tj = spineturn(j, n1, n2, k0, k1, k2)
+    sh = sh - tj
+    sx = sx - 4 * cos(sh * pi / 180)
+    sy = sy - 4 * sin(sh * pi / 180)
+    nh = (sh + spineturn(j - 1, n1, n2, k0, k1, k2) / 2) * pi / 180
+    r = halfwidth((j - 1) / n, w, a, b)
+    lineto(sx + r * sin(nh), sy - r * cos(nh))
+  }
+}
+
+// the long S: a hooked tip on the far left, a crest, a deep trough, then up through an
+// inflection into the right-hand ring, which it goes once around before its tip turns inward
+go(4.3, 426.7, 74.1)
+curve(19, -7.72, -2.33)
+curve(48, -2.33, 1.69)
+curve(48, 1.69, 0.96)
+curve(48, 0.96, -0.69)
+curve(63, -0.69, -1.58)
+curve(48, -1.58, 0.66)
+curve(48, 0.66, 1.78)
+curve(48, 1.78, 1.56)
+curve(63, 1.56, 1.70)
+curve(63, 1.70, 2.55)
+
+// the great circle: it starts under the crest of the S, runs down through the trough, climbs
+// the right side and comes back along the top, then bends the other way into a pointed leaf tip
+go(209.2, 388.2, 280.9)
+curve(12, 3.71, 2.82)
+curve(24, 2.82, 1.55)
+curve(36, 1.55, 0.11)
+curve(36, 0.11, -0.81)
+curve(36, -0.81, -1.32)
+curve(36, -1.32, -1.17)
+curve(36, -1.17, -1.02)
+curve(36, -1.02, -1.18)
+curve(36, -1.18, -1.01)
+curve(29, -1.01, 0.70)
+curve(19, 0.70, 2.51)
+curve(14, 2.51, 4.17)
+
+// the underside of that leaf: it leaves the top of the circle and swells down and round
+// to meet the circle again at the tip
+go(642.3, 103.8, 181.0)
+curve(16, -5.54, 1.61)
+curve(24, 1.61, 3.30)
+curve(24, 3.30, 1.30)
+
+// a fine stroke that leaves the right side of the circle going up, follows it on the
+// outside and then turns the other way into a small tight curl
+go(848.8, 265.0, 256.9)
+curve(25, -0.23, -1.56)
+curve(25, -1.56, -1.10)
+curve(19, -1.10, 3.52)
+curve(13, 3.52, 11.45)
+curve(13, 11.45, 19.68)
+curve(3, 19.68, 25.59)
+
+// the inner spiral: it peels off the circle near the bottom and winds in,
+// tightening steadily, with a last tighter turn at its eye
+go(769.0, 481.2, 324.9)
+curve(33, -2.74, -0.87)
+curve(33, -0.87, -1.95)
+curve(33, -1.95, -2.54)
+curve(27, -2.54, -3.46)
+curve(22, -3.46, -7.93)
+curve(22, -7.93, -14.67)
+curve(8, -14.67, -32.27)
+
+// a leaf hanging from the underside of the top leaf
+go(596.7, 119.6, 132.8)
+leaf(12, 12, -2.77, -1.32, 0.19, 14, 1.2, 0.6)
+
+// a slim leaf lying inside the circle near the top, rising off it with a blunt end
+go(845.1, 250.9, 253.7)
+leaf(19, 19, -1.77, -1.74, -2.69, 7, 1.3, 0.35)
+
+// the comma leaf in the middle of the circle, growing off the bottom and curling over at its head
+go(769.6, 480.8, 275.5)
+leaf(30, 30, 1.28, -1.46, -4.94, 15, 1.4, 0.3)
+
+// three leaves rising backwards out of the S where it runs down into the trough:
+// the long one leaning left
+go(462.9, 389.0, 223.8)
+leaf(28, 28, -0.38, -0.13, -1.54, 8, 1.7, 0.35)
+
+// the tall one with a curved point
+go(546.9, 464.2, 215.0)
+leaf(34, 34, -0.04, 2.16, -3.32, 12, 2.4, 0.6)
+
+// and a short slim one
+go(563.0, 474.9, 211.9)
+leaf(21, 21, 1.45, 0.97, 1.81, 5, 1.5, 0.35)
+
+// inside the right-hand ring, a short companion line that leaves the S as it rises
+go(875.5, 343.8, 302.2)
+curve(20, 0.59, 1.73)
+curve(20, 1.73, 2.70)
+
+// the right-hand spiral: it leaves the top of the ring, runs inside it all the way down and
+// round, and winds into its eye
+go(1074.0, 241.7, 17.7)
+curve(32, 2.30, 1.38)
+curve(32, 1.38, 1.76)
+curve(32, 1.76, 2.82)
+curve(26, 2.82, 3.59)
+curve(22, 3.59, 5.52)
+curve(22, 5.52, 8.24)
+curve(9, 8.24, 21.42)
+
+// a short tail splitting off the spiral at the bottom of the ring
+go(1030.3, 499.6, 192.1)
+curve(10, -0.93, 3.12)
+curve(10, 3.12, 7.02)

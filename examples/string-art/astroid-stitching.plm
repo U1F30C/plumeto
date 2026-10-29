@@ -1,0 +1,35 @@
+// the square's four corners stitched, and inside them an astroid: along each of four axes
+// the points are joined to the points on the next axis in reverse order
+pi = acos(-1)
+half = 200
+steps = 40
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+function turned_x(x, y, c) { return x * cos(c * pi / 2) - y * sin(c * pi / 2) }
+function turned_y(x, y, c) { return x * sin(c * pi / 2) + y * cos(c * pi / 2) }
+
+for c in 0..3 {
+  for i in 0..steps {
+    d = 2 * half * i / steps
+    line(turned_x(-half + d, -half, c), turned_y(-half + d, -half, c), turned_x(-half, half - d, c), turned_y(-half, half - d, c))
+  }
+}
+
+// the astroid: a point at distance reach * i / steps along one axis joins the point at
+// distance reach * (1 - i / steps) along the next one
+reach = half * 0.83
+for axis in 0..3 {
+  for i in 0..steps {
+    u = i / steps
+    a = axis * pi / 2
+    b = (axis + 1) * pi / 2
+    line(reach * u * cos(a), reach * u * sin(a), reach * (1 - u) * cos(b), reach * (1 - u) * sin(b))
+  }
+}

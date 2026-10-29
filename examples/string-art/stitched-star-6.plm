@@ -1,0 +1,24 @@
+// a six-pointed star with curved edges, made only of straight lines
+pi = acos(-1)
+points = 6
+reach = 200
+steps = 36
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+// a point at distance reach * i / steps along one axis joins the point at distance
+// reach * (1 - i / steps) along the next axis, and the straight lines trace the curved edges
+for axis in 0..points - 1 {
+  for i in 0..steps {
+    u = i / steps
+    a = 2 * pi * axis / points - pi / 2
+    b = 2 * pi * (axis + 1) / points - pi / 2
+    line(reach * u * cos(a), reach * u * sin(a), reach * (1 - u) * cos(b), reach * (1 - u) * sin(b))
+  }
+}

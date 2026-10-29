@@ -1,0 +1,44 @@
+// a hexagon opening like a camera shutter: each side of the small hexagon in the middle is
+// extended until it reaches the outer hexagon, and the six lines turn into six blades
+pi = acos(-1)
+radius = 200
+inner = 70
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+// how far a line leaving the point (px, py) in the direction (ux, uy) goes before it
+// reaches the outer hexagon
+function reach(px, py, ux, uy) {
+  best = 1000000
+  for k in 0..5 {
+    nx = cos(pi * (2 * k + 1) / 6)
+    ny = sin(pi * (2 * k + 1) / 6)
+    d = ux * nx + uy * ny
+    if d > 0.0001 {
+      best = min(best, (radius * cos(pi / 6) - (px * nx + py * ny)) / d)
+    }
+  }
+  return best
+}
+
+for i in 0..5 {
+  a = pi * i / 3
+  b = pi * (i + 1) / 3
+  // the outer hexagon
+  line(radius * cos(a), radius * sin(a), radius * cos(b), radius * sin(b))
+  // a side of the inner hexagon, carried on to the outside
+  wx = inner * cos(a)
+  wy = inner * sin(a)
+  ux = inner * cos(b) - wx
+  uy = inner * sin(b) - wy
+  len = hypot(ux, uy)
+  ux = ux / len
+  uy = uy / len
+  line(wx, wy, wx + ux * reach(wx, wy, ux, uy), wy + uy * reach(wx, wy, ux, uy))
+}

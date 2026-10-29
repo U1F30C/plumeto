@@ -1,0 +1,28 @@
+// curve stitching: at each corner of a square, the points on one side are joined to the
+// points on the other in reverse order, and the straight lines trace a parabola
+pi = acos(-1)
+half = 200
+steps = 40
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+// a point of the first corner, turned a quarter at a time around the middle
+function turned_x(x, y, c) { return x * cos(c * pi / 2) - y * sin(c * pi / 2) }
+function turned_y(x, y, c) { return x * sin(c * pi / 2) + y * cos(c * pi / 2) }
+
+for c in 0..3 {
+  for i in 0..steps {
+    d = 2 * half * i / steps
+    ax = -half + d
+    ay = -half
+    bx = -half
+    by = half - d
+    line(turned_x(ax, ay, c), turned_y(ax, ay, c), turned_x(bx, by, c), turned_y(bx, by, c))
+  }
+}

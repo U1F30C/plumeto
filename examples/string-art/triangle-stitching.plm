@@ -1,0 +1,27 @@
+// curve stitching on a triangle: the three corners leave a rounded triangle in the middle
+pi = acos(-1)
+sides = 3
+radius = 220
+steps = 36
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+// at every corner the points along one side are joined to the points along the other side
+// in reverse order; the lines of all the corners leave a curved hole in the middle
+for corner in 0..sides - 1 {
+  a = 2 * pi * corner / sides - pi / 2
+  b = 2 * pi * (corner + 1) / sides - pi / 2
+  c = 2 * pi * (corner - 1) / sides - pi / 2
+  vx = radius * cos(a)
+  vy = radius * sin(a)
+  for i in 0..steps {
+    u = i / steps
+    line(vx + (radius * cos(b) - vx) * u, vy + (radius * sin(b) - vy) * u, vx + (radius * cos(c) - vx) * (1 - u), vy + (radius * sin(c) - vy) * (1 - u))
+  }
+}

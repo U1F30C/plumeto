@@ -1,0 +1,20 @@
+// each triangle has its corners a fraction of the way along the sides of the one before it
+sides = 3
+t = 0.1
+layers = 36
+size = 400
+
+e = 360 / sides
+a = acos(-1) * 2 / sides
+for layer in 1..layers {
+  for side in 1..sides {
+    forward size
+    rotate e deg
+  }
+  // slide along the first side, then turn to match the next polygon
+  cursor off
+  forward t * size
+  cursor on
+  rotate atan2(t * sin(a), 1 - t + t * cos(a)) rad
+  size = size * sqrt((1 - t)^2 + t^2 + 2 * t * (1 - t) * cos(a))
+}

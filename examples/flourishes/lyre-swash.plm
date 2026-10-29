@@ -1,0 +1,166 @@
+// a flourish that climbs from a single tapered root: the main stroke rises, swings round
+// into a wide loop and curls back under itself, while a long tendril leaves it and sweeps
+// up and to the right, rolls over a full bulge and ends in a small looped S. Around them a
+// thin whip runs off the top of the loop to the far left, a short hook turns back over
+// the base, a crook hangs down across the tendril, and two leaves open to the right.
+//
+// Every stroke is built from Euler spiral pieces: in each piece the turn per step glides
+// from one value to the next, and the next piece starts with the turn the last one ended
+// on, so the curvature never jumps. Side strokes leave their parent going straight (turn
+// 0) and only then bend, so they peel away tangentially. The curvature values were fitted
+// to the reference by simulating the turtle in a small script.
+//
+// The leaves are drawn from a formula in the leaf's own frame: the half width at a
+// fraction s of the length is s^a * (1 - s)^b, with a different width on either side of
+// the midrib so a leaf can be fuller on one side, and a gentle curl along it.
+
+pi = acos(-1)
+
+// a curve of 4-pixel steps whose turn per step glides from k0 to k1 degrees
+function curve(steps, k0, k1) {
+  for i in 1..steps {
+    forward 4
+    rotate (k0 + (k1 - k0) * i / steps) deg
+  }
+}
+
+// move in a straight line to (x, y) in the leaf's own frame, where the leaf starts at
+// (0, 0) and points along +x; lx, ly and lh remember where the pen is and where it faces
+function lineto(x, y) {
+  d = atan2(y - ly, x - lx) * 180 / pi
+  rotate (d - lh) deg
+  forward hypot(x - lx, y - ly)
+  lh = d
+  lx = x
+  ly = y
+}
+
+// the half width of a leaf at a fraction s of its length, scaled so the widest point is 1
+function halfwidth(s, a, b) {
+  m = pow(a / (a + b), a) * pow(b / (a + b), b)
+  return pow(s, a) * pow(1 - s, b) / m
+}
+
+// a leaf outline: out along the left edge to the tip and back along the right one. The
+// points crowd together at both ends, where the outline bends most.
+function blade(len, wl, wr, curl, a, b) {
+  breadcrumb push
+  lx = 0
+  ly = 0
+  lh = 0
+  n = 16
+  for i in 1..n {
+    s = (1 - cos(pi * i / n)) / 2
+    lineto(len * s, curl * len * s * s - wl * halfwidth(s, a, b))
+  }
+  for i in 1..n {
+    s = (1 + cos(pi * i / n)) / 2
+    lineto(len * s, curl * len * s * s + wr * halfwidth(s, a, b))
+  }
+  breadcrumb pop
+}
+
+// the main stroke, from the tip of its root, turned by tilt degrees about that tip
+function swash(tilt) {
+breadcrumb push
+cursor off
+place 339.6, 947.9
+rotate -84 + tilt deg
+cursor on
+
+curve(18, 0.26, 0.40)
+
+// the lower leaf: a long stalk that leans away from the stem and opens into a blade,
+// fuller on its lower side
+breadcrumb push
+curve(8, 0, 1.8)
+curve(39, 1.8, 0)
+blade(258, 24, 38, 0.09, 3.2, 1.2)
+breadcrumb pop
+
+curve(21, 0.40, 0.57)
+curve(20, 0.57, 0.65)
+
+// the hook that turns back over the base, tightening as it rises and arching over
+breadcrumb push
+curve(4, 0, -1.55)
+curve(24, -1.55, -2.63)
+curve(22, -2.63, -2.82)
+curve(20, -2.82, -0.75)
+breadcrumb pop
+
+curve(8, 0.65, 0.69)
+
+// the long tendril: a quick curl off the stem, a long climb that leans ever further to
+// the right, then a full bulge that rolls it over to the left
+breadcrumb push
+curve(12, 0, -4)
+curve(16, -4, 1.1)
+curve(45, 1.1, 0.8)
+curve(50, 0.8, 0.44)
+curve(52, 0.44, -2.37)
+curve(38, -2.37, -3.03)
+// a fine tail runs on to the left, easing out
+breadcrumb push
+curve(6, -3.03, -0.2)
+curve(20, -0.2, -0.8)
+breadcrumb pop
+// while the stroke itself turns back on its curvature into a small loop over the top
+curve(6, -3.03, 5.64)
+curve(11, 5.64, 7.2)
+curve(15, 7.2, 2.88)
+curve(16, 2.88, 4.96)
+curve(10, 4.96, 9)
+breadcrumb pop
+
+curve(13, 0.69, 0.74)
+curve(22, 0.74, -1.91)
+
+// the upper leaf on a stalk that straightens and then bends into it; it bulges on its
+// upper side and points to the right
+breadcrumb push
+curve(30, 0, 0.6)
+curve(14, 0.6, 4)
+blade(102, 50, 9, 0.07, 1.0, 0.8)
+breadcrumb pop
+
+// round the bend of the loop and over its top
+curve(11, -1.91, -3.24)
+curve(34, -3.24, -0.93)
+curve(29, -0.93, -0.73)
+curve(23, -0.73, -1.07)
+
+// the whip: it runs off the loop far to the left and down, and flicks back at its end
+breadcrumb push
+curve(21, 0, -0.51)
+curve(26, -0.51, -0.87)
+curve(30, -0.87, -0.49)
+curve(29, -0.49, -3.85)
+breadcrumb pop
+
+// down the left side of the loop and in underneath
+curve(12, -1.07, -1.25)
+curve(42, -1.25, -1.88)
+curve(51, -1.88, 0.11)
+breadcrumb pop
+}
+
+// drawn five times, each copy turned a little further about the root: the copies lie
+// together near the root and fan apart towards the ends, like a brush stroke that swells
+// as it goes, built only from fine lines
+for k in -2..2 {
+  swash(k * 1.1)
+}
+
+// the crook that hangs across the tendril: it starts at a point, swings round and
+// sweeps back down to the left
+breadcrumb push
+cursor off
+place 673.7, 231
+rotate 48.3 deg
+cursor on
+curve(20, 1.42, 2.6)
+curve(18, 2.6, 0.91)
+curve(18, 0.91, 1.44)
+curve(20, 1.44, -1.58)
+breadcrumb pop

@@ -1,0 +1,188 @@
+// a climbing tulip vine, after a wallpaper pattern: one stem sways up the page in a slow
+// S, and at the outside of every bend a flower stalk peels off, swings out in a long arc
+// and lifts into a closed tulip bud; some stalks fork to carry a second, smaller bud.
+// Between the bends, where the stem straightens for a moment, a pair of leaves opens on
+// the opposite side: a plain one with a midrib and a veined one below it.
+//
+// All the stems are Euler spiral pieces: the turn per step glides from one value to the
+// next, and each piece starts with the turn the previous one ended on, so the curvature
+// never jumps. The main stem swings its turn between +k and -k; a stalk leaves it with no
+// turn at all, so it peels away tangentially, and only then bends.
+//
+// Leaves and petals are drawn from a formula rather than from arcs: the half width at a
+// fraction s along the blade is s^a * (1 - s)^b, laid off on both sides of a midrib that
+// bends evenly, so a leaf comes out as a slim crescent whose tip curls upwards. A small a
+// gives a petal a round belly, which is how the tulip cups get their shape.
+//
+// The colors follow the wallpaper: tan stems and leaves, paler cream-gold veined leaves, and
+// red buds. Every part sets its own color and puts the stem color back when it is done.
+
+pi = acos(-1)
+
+// #a8844d stem and plain leaves, #d2b87f veined leaves, #b5202b buds
+
+// a curve of 4-pixel steps whose turn per step glides from k0 to k1 degrees
+function curve(steps, k0, k1, side) {
+  for i in 1..steps {
+    forward 4
+    rotate side * (k0 + (k1 - k0) * i / steps) deg
+  }
+}
+
+// move in a straight line to (x, y) in the blade's own frame, where it starts at (0, 0)
+// and points along +x; lx, ly and lh remember where the pen is and where it faces
+function lineto(x, y) {
+  d = atan2(y - ly, x - lx) * 180 / pi
+  rotate (d - lh) deg
+  forward hypot(x - lx, y - ly)
+  lh = d
+  lx = x
+  ly = y
+}
+
+// the half width of a blade at a fraction s of its length, scaled so the widest point is 1
+function halfwidth(s, a, b) {
+  m = pow(a / (a + b), a) * pow(b / (a + b), b)
+  return pow(s, a) * pow(1 - s, b) / m
+}
+
+// go to the point at fraction s along a midrib that bends evenly through th radians,
+// offset sideways by off
+function go(s, off, len, th, side) {
+  t = th
+  if abs(t) < 0.000001 {
+    t = 0.000001
+  }
+  x = len * sin(t * s) / t - off * sin(t * s)
+  y = len * (1 - cos(t * s)) / t + off * cos(t * s)
+  lineto(x, side * y)
+}
+
+// a blade outline: out along one edge to the tip and back along the other, with the points
+// crowded at both ends; veins -1 adds a midrib, veins > 0 a midrib and that many pairs
+// of side veins
+function blade(len, wid, th, a, b, veins, side) {
+  breadcrumb push
+  lx = 0
+  ly = 0
+  lh = 0
+  n = 16
+  for i in 1..n {
+    go((1 - cos(pi * i / n)) / 2, -wid * halfwidth((1 - cos(pi * i / n)) / 2, a, b), len, th, side)
+  }
+  for i in 1..n {
+    go((1 + cos(pi * i / n)) / 2, wid * halfwidth((1 + cos(pi * i / n)) / 2, a, b), len, th, side)
+  }
+  if veins != 0 {
+    for i in 1..8 {
+      go(0.85 * i / 8, 0, len, th, side)
+    }
+  }
+  if veins > 0 {
+    // side veins, sweeping toward the tip from the rib out to near the edge
+    for j in 1..veins {
+      s0 = 0.16 + 0.62 * (j - 1) / veins
+      for e in 0..1 {
+        cursor off
+        go(s0, 0, len, th, side)
+        cursor on
+        for q in 1..4 {
+          go(s0 + 0.16 * q / 4, (2 * e - 1) * 0.8 * wid * halfwidth(s0 + 0.16 * q / 4, a, b) * (1 - (1 - q / 4) * (1 - q / 4)), len, th, side)
+        }
+      }
+    }
+  }
+  breadcrumb pop
+}
+
+// a slender leaf, widest a little below the middle
+function leaf(len, curl, veins, side) {
+  blade(len, len * 0.13, curl, 1.1, 1.5, veins, side)
+}
+
+// a leaf on a short stalk leaving at an angle and bending the way the leaf curls
+function sprout(angle, len, curl, veins, side) {
+  breadcrumb push
+  rotate side * angle deg
+  curve(4, 0, curl * 3, side)
+  if veins > 0 {
+    color #d2b87f
+  }
+  leaf(len, curl, veins, side)
+  color #a8844d
+  breadcrumb pop
+}
+
+// a tulip bud: two outer petals with round bellies that close to points, a third peeping
+// between their tips, and two little sepals flaring at the base
+function bud(size, side) {
+  breadcrumb push
+  color #b5202b
+  rotate side * -80 deg
+  blade(size * 0.3, size * 0.06, 0.7, 1, 1.4, 0, side)
+  rotate side * 160 deg
+  blade(size * 0.3, size * 0.06, -0.7, 1, 1.4, 0, side)
+  rotate side * -80 deg
+  blade(size, size * 0.15, 0, 0.6, 0.9, 0, side)
+  breadcrumb push
+  rotate side * -7 deg
+  blade(size * 0.94, size * 0.23, -0.22, 0.55, 0.9, 0, side)
+  breadcrumb pop
+  breadcrumb push
+  rotate side * 7 deg
+  blade(size * 0.94, size * 0.23, 0.22, 0.55, 0.9, 0, side)
+  breadcrumb pop
+  color #a8844d
+  breadcrumb pop
+}
+
+// a flower stalk: peels off tangentially, swings outward in a long arc, then lifts into
+// a bud; extra > 0 adds a shorter stalk with a smaller bud partway along
+function flower(len, size, extra, side) {
+  breadcrumb push
+  curve(12, 0, 3, side)
+  curve(len, 3, -0.6, side)
+  if extra > 0 {
+    breadcrumb push
+    curve(10, 0, 3.5, side)
+    curve(14, 3.5, -1, side)
+    curve(14, -1, -3, side)
+    bud(size * 0.8, side)
+    breadcrumb pop
+  } else {
+    sprout(60, 140, -0.6, -1, side)
+  }
+  curve(len, -0.6, -2.4, side)
+  curve(10, -2.4, -1.2, side)
+  bud(size, side)
+  breadcrumb pop
+}
+
+// a pair of leaves, both curling upwards
+function pair(side) {
+  sprout(50, 210, -0.4, -1, side)
+  sprout(88, 170, -0.8, 5, side)
+}
+
+// the main stem: half waves of 76 steps, each with a stalk at its bend and a leaf pair
+// halfway between bends
+k = 2.0
+color #a8844d
+place 0, 0
+rotate -124 deg
+curve(25, 0, k, 1)
+flower(25, 105, 0, -1)
+curve(38, k, 0, 1)
+pair(1)
+curve(38, 0, -k, 1)
+flower(30, 105, 1, 1)
+curve(38, -k, 0, 1)
+pair(-1)
+curve(38, 0, k, 1)
+flower(25, 105, 1, -1)
+curve(38, k, 0, 1)
+pair(1)
+curve(38, 0, -k, 1)
+flower(25, 105, 0, 1)
+curve(40, -k, 0.5, 1)
+bud(105, 1)

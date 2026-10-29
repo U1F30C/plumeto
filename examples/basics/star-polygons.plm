@@ -1,0 +1,37 @@
+// the star polygons {12/1} to {12/6}: 12 points on a circle, each joined to the one k steps along
+pi = acos(-1)
+n = 12
+radius = 90
+gap = 220
+
+function hue(k) {
+  if k == 1 { color lightpink }
+  else if k == 2 { color lightsalmon }
+  else if k == 3 { color khaki }
+  else if k == 4 { color palegreen }
+  else if k == 5 { color lightskyblue }
+  else { color plum }
+}
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+function star(cx, cy, k) {
+  hue(k)
+  last = n - 1
+  if 2 * k == n { last = n / 2 - 1 }
+  for i in 0..last {
+    a = 2 * pi * i / n
+    b = 2 * pi * (i + k) / n
+    line(cx + radius * cos(a), cy + radius * sin(a), cx + radius * cos(b), cy + radius * sin(b))
+  }
+}
+
+for k in 1..6 {
+  star(((k - 1) % 3) * gap, floor((k - 1) / 3) * gap, k)
+}

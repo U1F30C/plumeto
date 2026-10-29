@@ -1,0 +1,75 @@
+// a random network, a real graph with loops: node i sits on a spiral turned by the golden
+// angle each step, and is joined to the nodes 5, 8 and 13 places along (Fibonacci numbers, so
+// the lines close up into triangles). A node's place is worked out from its number, so a line
+// can find both of its ends again. The seed picked at the start gives every run its own
+// jitter, sizes, colors and missing links.
+pi = acos(-1)
+count = 48
+spacing = 27
+seed = floor(random(1) * 1000)
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+// a repeatable "random" number between 0 and 1 for each value of n
+function noise(n) {
+  h = sin(n * 12.9898 + seed * 78.233) * 43758.5453
+  return h - floor(h)
+}
+
+function node_x(i) {
+  return spacing * sqrt(i + 0.5) * cos(i * pi * (3 - sqrt(5))) + (noise(2 * i) - 0.5) * spacing * 0.5
+}
+
+function node_y(i) {
+  return spacing * sqrt(i + 0.5) * sin(i * pi * (3 - sqrt(5))) + (noise(2 * i + 1) - 0.5) * spacing * 0.5
+}
+
+function node_size(i) {
+  return 5 + noise(3 * i + 7) * 5
+}
+
+// a circle filled in with one tight spiral
+function disc(x, y, radius) {
+  steps = 16
+  pitch = 1.8
+  for step in 0..radius / pitch * steps - 1 {
+    r0 = radius - step / steps * pitch
+    r1 = radius - (step + 1) / steps * pitch
+    a0 = 2 * pi * step / steps
+    a1 = 2 * pi * (step + 1) / steps
+    line(x + r0 * cos(a0), y + r0 * sin(a0), x + r1 * cos(a1), y + r1 * sin(a1))
+  }
+}
+
+// join two nodes, stopping at the edge of each circle; some links are left out
+function connect(i, j) {
+  if j < count {
+    if noise(5 * i + j) < 0.82 {
+      dx = node_x(j) - node_x(i)
+      dy = node_y(j) - node_y(i)
+      d = hypot(dx, dy)
+      line(node_x(i) + dx / d * node_size(i), node_y(i) + dy / d * node_size(i), node_x(j) - dx / d * node_size(j), node_y(j) - dy / d * node_size(j))
+    }
+  }
+}
+
+color silver
+for i in 0..count - 1 {
+  connect(i, i + 5)
+  connect(i, i + 8)
+  connect(i, i + 13)
+}
+
+for i in 0..count - 1 {
+  pick = noise(7 * i + 3)
+  if pick < 0.2 { color tomato }
+  else if pick < 0.5 { color goldenrod }
+  else { color steelblue }
+  disc(node_x(i), node_y(i), node_size(i))
+}

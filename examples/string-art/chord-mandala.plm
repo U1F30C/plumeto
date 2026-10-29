@@ -1,0 +1,34 @@
+// every point on a circle joined to every other one, colored by how far apart they are
+pi = acos(-1)
+n = 24
+radius = 200
+
+function hue(k) {
+  m = (k - 1) % 6
+  if m == 0 { color crimson }
+  else if m == 1 { color darkorange }
+  else if m == 2 { color goldenrod }
+  else if m == 3 { color seagreen }
+  else if m == 4 { color dodgerblue }
+  else { color blueviolet }
+}
+
+// the chord from point i to the point k steps further around
+function chord(i, k) {
+  start = 2 * pi * i / n
+  heading = start + pi / 2 + pi * k / n
+  place radius * cos(start), radius * sin(start)
+  rotate heading rad
+  forward 2 * radius * sin(pi * k / n)
+  rotate -heading rad
+}
+
+for k in 1..n / 2 {
+  hue(k)
+  // a diameter is the same line from both of its ends
+  last = n - 1
+  if 2 * k == n { last = n / 2 - 1 }
+  for i in 0..last {
+    chord(i, k)
+  }
+}

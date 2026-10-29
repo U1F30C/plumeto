@@ -2,7 +2,7 @@ phi = 1.618034
 
 function leaf(_){
   rand = random(1)
-  step = 4 + rand * 4
+  step = 4 + rand * 2
   i = 90 /4
   angle = 0.4 * 4
 

@@ -1,0 +1,25 @@
+// a pinwheel on a hexagon: a point that slides out along a spoke is joined to the point that
+// slides along the side the spoke leads to, and the straight lines bend into six curved blades
+pi = acos(-1)
+sides = 6
+radius = 220
+steps = 36
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+for corner in 0..sides - 1 {
+  a = 2 * pi * corner / sides - pi / 2
+  b = 2 * pi * (corner + 1) / sides - pi / 2
+  vx = radius * cos(a)
+  vy = radius * sin(a)
+  for i in 0..steps {
+    u = i / steps
+    line(vx * u, vy * u, vx + (radius * cos(b) - vx) * u, vy + (radius * sin(b) - vy) * u)
+  }
+}

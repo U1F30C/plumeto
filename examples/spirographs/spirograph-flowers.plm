@@ -1,0 +1,38 @@
+// hypotrochoids, the curves a pen traces when it sits inside a small wheel rolling in a big ring
+pi = acos(-1)
+size = 150
+gap = 340
+
+function line(x1, y1, x2, y2) {
+  heading = atan2(y2 - y1, x2 - x1)
+  place x1, y1
+  rotate heading rad
+  forward hypot(x2 - x1, y2 - y1)
+  rotate -heading rad
+}
+
+// ring radius, wheel radius, how far the pen is from the wheel's middle, and how many
+// times around the ring the wheel must go for the curve to close
+function spiro(cx, cy, ring, wheel, pen, turns) {
+  scale = size / (ring - wheel + pen)
+  steps = 70 * turns
+  for i in 1..steps {
+    t0 = 2 * pi * turns * (i - 1) / steps
+    t1 = 2 * pi * turns * i / steps
+    line(
+      cx + scale * ((ring - wheel) * cos(t0) + pen * cos((ring - wheel) / wheel * t0)),
+      cy + scale * ((ring - wheel) * sin(t0) - pen * sin((ring - wheel) / wheel * t0)),
+      cx + scale * ((ring - wheel) * cos(t1) + pen * cos((ring - wheel) / wheel * t1)),
+      cy + scale * ((ring - wheel) * sin(t1) - pen * sin((ring - wheel) / wheel * t1))
+    )
+  }
+}
+
+color lightpink
+spiro(0, 0, 13, 5, 8, 5)
+color palegreen
+spiro(gap, 0, 17, 6, 11, 6)
+color lightskyblue
+spiro(0, gap, 12, 5, 9, 5)
+color plum
+spiro(gap, gap, 19, 8, 12, 8)

@@ -49,10 +49,59 @@ exports[`examples > basics/star.plm 1`] = `
 }
 `;
 
+exports[`examples > basics/star-polygons.plm 1`] = `
+{
+  "hash": "421b1ce6e3e6f325f71afa68df1dd47d9779c912",
+  "segments": 66,
+}
+`;
+
+exports[`examples > flourishes/circle-swash.plm 1`] = `
+{
+  "hash": "a7c60b4307804a5bcacf14c9cfa67c5e568a263f",
+  "segments": 1444,
+}
+`;
+
+exports[`examples > flourishes/double-spiral.plm 1`] = `
+{
+  "hash": "7bee00eabc0fe470fcc1f1b633be0ca50d655026",
+  "segments": 200,
+}
+`;
+
+exports[`examples > flourishes/lyre-swash.plm 1`] = `
+{
+  "hash": "e731261daced792bb36f978b8024dacad6f47295",
+  "segments": 4736,
+}
+`;
+
+exports[`examples > flourishes/scroll-flourish.plm 1`] = `
+{
+  "hash": "421373be4699a6bb7a769815cf3a1ae4e26457c8",
+  "segments": 2093,
+}
+`;
+
+exports[`examples > flourishes/tulip-vine.plm 1`] = `
+{
+  "hash": "39ebda22af6b9c47c21c93e56600de023a1a6f77",
+  "segments": 2259,
+}
+`;
+
 exports[`examples > golden-ratio/golden-flower.plm 1`] = `
 {
-  "hash": "1170c0164a6ab75c17032d69c22a4b60622e600b",
+  "hash": "2dd7891e340fbcda22f353c32e124d8e4b8c1c57",
   "segments": 1584,
+}
+`;
+
+exports[`examples > golden-ratio/golden-nautilus.plm 1`] = `
+{
+  "hash": "1044e7b10f798c7cc6764de757f58476234bd390",
+  "segments": 440,
 }
 `;
 
@@ -67,13 +116,6 @@ exports[`examples > golden-ratio/golden-symetrical-circle.plm 1`] = `
 {
   "hash": "d4310b449e6a55054023171e65b53c712cbc5c68",
   "segments": 620,
-}
-`;
-
-exports[`examples > golden-ratio/golden-tentacle.plm 1`] = `
-{
-  "hash": "1044e7b10f798c7cc6764de757f58476234bd390",
-  "segments": 440,
 }
 `;
 
@@ -217,17 +259,17 @@ exports[`examples > l-systems/weed(stochastic).plm 1`] = `
 }
 `;
 
-exports[`examples > l-systems/weed(stochastic,2rounds).plm 1`] = `
-{
-  "hash": "c736e3b2aec5e0ffe79b818cbaf624f38c33cf77",
-  "segments": 4650,
-}
-`;
-
 exports[`examples > l-systems/weed.plm 1`] = `
 {
   "hash": "51f652ba63a47507c3834d23d36f92ba8edeea23",
   "segments": 8001,
+}
+`;
+
+exports[`examples > patterns/braid.plm 1`] = `
+{
+  "hash": "a1a0e4a046d845dde83f87dda271738b5bbf5488",
+  "segments": 1920,
 }
 `;
 
@@ -245,6 +287,13 @@ exports[`examples > patterns/heptapod-logogram.plm 1`] = `
 }
 `;
 
+exports[`examples > patterns/hexagon-aperture.plm 1`] = `
+{
+  "hash": "bdc84a7ccedce75615c54c117468bce9d52f6d0b",
+  "segments": 12,
+}
+`;
+
 exports[`examples > patterns/honeycomb.plm 1`] = `
 {
   "hash": "6cddb40d3278445e877cb74ba05f580952cd8b89",
@@ -256,6 +305,13 @@ exports[`examples > patterns/interlaced.plm 1`] = `
 {
   "hash": "e31609d3ec53ccf10bddbe5d9fad412be67974b1",
   "segments": 6750,
+}
+`;
+
+exports[`examples > patterns/network.plm 1`] = `
+{
+  "hash": "5045ed59086960539be7305c7eef3e07d8a72de5",
+  "segments": 3405,
 }
 `;
 
@@ -284,5 +340,110 @@ exports[`examples > patterns/stick-saw.plm 1`] = `
 {
   "hash": "d08af13a006eb7e379974004891079e5312abd36",
   "segments": 192,
+}
+`;
+
+exports[`examples > spirographs/spirograph-flowers.plm 1`] = `
+{
+  "hash": "84ffbafa96f7e79e56a670fb44b8c16997d2e934",
+  "segments": 1680,
+}
+`;
+
+exports[`examples > spirographs/spirograph-rosettes.plm 1`] = `
+{
+  "hash": "b846619ebc64f67a849f039418009fe83ea87c03",
+  "segments": 2030,
+}
+`;
+
+exports[`examples > spirographs/spirograph-stars.plm 1`] = `
+{
+  "hash": "a3834126d9297ad07648e927eaea721b4b406a15",
+  "segments": 1470,
+}
+`;
+
+exports[`examples > string-art/astroid-stitching.plm 1`] = `
+{
+  "hash": "842af020c0407a0de035d1fff8542788342eae1c",
+  "segments": 328,
+}
+`;
+
+exports[`examples > string-art/chord-mandala.plm 1`] = `
+{
+  "hash": "a15bb539a0098adbc06da26059697b498de60185",
+  "segments": 276,
+}
+`;
+
+exports[`examples > string-art/chord-ring.plm 1`] = `
+{
+  "hash": "d28f2ca39038002146f1e668bbefdbb0bbd7dc4b",
+  "segments": 90,
+}
+`;
+
+exports[`examples > string-art/corner-stitching.plm 1`] = `
+{
+  "hash": "b6d30a8d33ac51f2ab86665a1bbe8a0b54780446",
+  "segments": 164,
+}
+`;
+
+exports[`examples > string-art/eccentric-circle.plm 1`] = `
+{
+  "hash": "626033dd40be4e1df819ff477a39ccbf2d12763f",
+  "segments": 144,
+}
+`;
+
+exports[`examples > string-art/hexagon-pinwheel.plm 1`] = `
+{
+  "hash": "b7d639c9cadbbafb1844d6997a3b422ffd9e4682",
+  "segments": 222,
+}
+`;
+
+exports[`examples > string-art/star-polygon-ring.plm 1`] = `
+{
+  "hash": "12621e4654b3216245a0b21fe0709a92ca9ca0e0",
+  "segments": 29,
+}
+`;
+
+exports[`examples > string-art/stitched-star-6.plm 1`] = `
+{
+  "hash": "6b2eaf13d2de550d0b288f5119cbc0894d8f8564",
+  "segments": 222,
+}
+`;
+
+exports[`examples > string-art/times-table-cardioid.plm 1`] = `
+{
+  "hash": "edd3ce2a80b568dd6d96ac456aee8e71c8499e91",
+  "segments": 144,
+}
+`;
+
+exports[`examples > string-art/triangle-stitching.plm 1`] = `
+{
+  "hash": "902fd7e7cf4210dab31a16a01ef244af904e2cac",
+  "segments": 111,
+}
+`;
+
+exports[`examples > whirls/hexagon-whirl.plm 1`] = `
+{
+  "hash": "69238cde0efaea2b12349c2db034fc47c944a299",
+  "segments": 288,
+}
+`;
+
+exports[`examples > whirls/triangle-whirl.plm 1`] = `
+{
+  "hash": "159cf1225677b40e8db558d2bd3b116557c56838",
+  "segments": 108,
 }
 `;

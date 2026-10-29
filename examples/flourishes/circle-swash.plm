@@ -1,0 +1,92 @@
+// a calligraphic separator: one long swash that sweeps out into a loop on each side and
+// crosses itself in the middle, with a ring laid over the crossings whose stroke runs on
+// below it into a flat loop, a tiny loop and a curl
+//
+// The swash is a single pen stroke. It starts at the curl on the right, unwinds through
+// the bottom right, rises leftwards through the middle into the big left loop, comes back
+// along the bottom and climbs to the right loop, runs round it and returns over the top to
+// end in the hook on the left. The ring starts at its thin tail at the bottom, goes round
+// clockwise and keeps turning the same way into a flattened loop under itself, then
+// swings down, turns back on itself in a tiny loop and finishes with a hook.
+//
+// Every stroke is a chain of Euler spiral pieces: in each piece the turn per step glides
+// from one value to the next, and each piece starts on the turn the previous one ended
+// with, so the curvature never jumps and the lines flow. The turn values were found by
+// tracing points along the reference and fitting the chain to them.
+
+// a run of short steps whose turn per step glides from k0 to k1 degrees
+function curve(steps, k0, k1) {
+  for i in 1..steps {
+    forward step
+    rotate (k0 + (k1 - k0) * i / steps) deg
+  }
+}
+
+// the swash
+breadcrumb push
+place 679, 222
+rotate -87.03 deg
+step = 2.525
+// the curl on the right unwinds
+curve(10, 7.632, 5.804)
+curve(17, 5.804, 3.239)
+curve(15, 3.239, 2.619)
+curve(17, 2.619, 1.802)
+curve(20, 1.802, 1.211)
+curve(28, 1.211, 0.553)
+// a long, nearly straight sweep up through the middle
+curve(63, 0.553, 0.077)
+curve(89, 0.077, -0.437)
+// round the left loop, against the clock
+curve(46, -0.437, -0.946)
+curve(41, -0.946, -2.229)
+curve(42, -2.229, -1.051)
+curve(57, -1.051, -0.308)
+// along the bottom and up through the middle again
+curve(76, -0.308, -0.032)
+curve(109, -0.032, 0.087)
+// round the right loop, with the clock
+curve(53, 0.087, 2.135)
+curve(33, 2.135, 2.659)
+curve(43, 2.659, 0.149)
+// back through the middle and over the top into the hook on the left
+curve(47, 0.149, 0.642)
+curve(63, 0.642, -0.173)
+curve(63, -0.173, -0.645)
+curve(37, -0.645, -1.491)
+curve(27, -1.491, -1.994)
+curve(5, -1.994, -2.400)
+curve(8, -2.400, -7.000)
+breadcrumb pop
+
+// the ring
+breadcrumb push
+place 428, 337
+rotate -170.1 deg
+step = 2.515
+curve(62, 1.47, 1.14)
+curve(75, 1.14, 1.12)
+curve(77, 1.12, 1.20)
+curve(49, 1.20, 0.81)
+// it slackens as it falls, then tightens round the end of the flat loop
+curve(21, 0.81, 0.59)
+curve(24, 0.59, 1.90)
+curve(6, 1.90, 13.00)
+curve(7, 13.00, 13.00)
+curve(5, 13.00, 2.00)
+// along the top of the loop, over and down
+curve(14, 2.00, 0.40)
+curve(14, 0.40, 6.00)
+curve(12, 6.00, 3.00)
+curve(10, 3.00, 5.00)
+curve(11, 5.00, 2.00)
+// the tiny loop turns the other way, then the final hook
+curve(4, 2, -18)
+curve(7, -18, -20)
+curve(4, -20, -4)
+curve(7, -4, 1)
+curve(8, 1, 21)
+curve(6, 21, 4)
+curve(6, 4, 10)
+curve(6, 10, 16)
+breadcrumb pop
